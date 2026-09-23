@@ -45,3 +45,23 @@ Added authority zones:
 - =report=
 
 The contract is centralized in =manifest_schema.py=.
+
+
+* 003
+
+#+begin_example
+003 feat: implement dry-run manifest validation
+#+end_example
+
+Added pre-execution validation for:
+
+- manifest existence and readability
+- exact header structure
+- positive integer step values
+- duplicate steps
+- allowed modes
+- allowed authority zones
+- required inputs
+- mode-dependent outputs
+
+Added structured =ValidationIssue= records and basic unit-test fixtures.

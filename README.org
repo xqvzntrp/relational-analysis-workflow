@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v002
+#+VERSION: v003
 #+STARTUP: overview
 
 * Purpose
@@ -13,8 +13,8 @@ The runner is designed around three manifest operations:
 - =run_sql=
 - =export_sql=
 
-This version defines the manifest contract and authority zones. Execution
-and validation behavior will be implemented in later commits.
+This version implements the first dry-run manifest validation pass. Execution
+behavior will be implemented in later commits.
 
 * Command-line contract
 
@@ -85,10 +85,32 @@ run-py/
 └── tests/
 #+end_example
 
+* Dry-run validation
+
+The dry run now validates:
+
+- manifest file existence
+- exact manifest header order
+- positive integer step values
+- duplicate step values
+- allowed modes
+- allowed authority zones
+- required input values
+- required outputs for =load_csv= and =export_sql=
+
+Validation returns nonzero when any issue is found and prints a concise,
+human-readable message plus a corrective hint.
+
+Example:
+
+#+begin_src shell
+python3 run.py --dry-run tests/fixtures/valid_manifest.csv
+#+end_src
+
 * Current milestone
 
-v002 corresponds to commit 002:
+v003 corresponds to commit 003:
 
 #+begin_example
-002 feat: define manifest schema and authority zones
+003 feat: implement dry-run manifest validation
 #+end_example

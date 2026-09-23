@@ -1,0 +1,4 @@
+step,mode,input,output,authority_zone
+1,load_csv,data/product.csv,source_product,source
+1,bad_mode,,,unknown
+3,export_sql,,,report
