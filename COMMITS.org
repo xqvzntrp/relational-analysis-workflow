@@ -127,3 +127,22 @@ The runner now:
 
 This establishes the execution lifecycle before concrete mode handlers are
 introduced.
+
+
+* 007
+
+#+begin_example
+007 feat: implement load_csv execution
+#+end_example
+
+Added the first concrete manifest mode.
+
+=load_csv= now:
+
+- resolves the source CSV relative to the manifest
+- recreates the package DuckDB database for each run
+- creates or replaces the declared target relation
+- loads CSV data with DuckDB =read_csv_auto=
+- reports the loaded row count
+
+Added =duckdb= to =requirements.txt= and added CSV execution fixtures/tests.

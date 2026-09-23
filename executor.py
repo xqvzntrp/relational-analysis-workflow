@@ -1,6 +1,6 @@
-"""Execution skeleton for manifest-driven packages.
+"""Execution engine for manifest-driven packages.
 
-v006 establishes execution flow without implementing concrete modes yet.
+v007 implements the load_csv mode.
 """
 
 from __future__ import annotations
@@ -8,8 +8,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from manifest_inspector import ManifestRowInspection, inspect_manifest
+import duckdb
+
+from manifest_inspector import inspect_manifest
 from manifest_validator import validate_manifest
+from mode_handlers import load_csv
 
 
 @dataclass(frozen=True)
@@ -20,27 +23,60 @@ class ExecutionResult:
     message: str
 
 
-def execute_manifest(path: Path) -> tuple[list[ExecutionResult], list]:
-    """Validate first, then walk the manifest in order.
+def database_path_for_manifest(path: Path) -> Path:
+    """Return the package-local execution database path."""
+    artifacts_dir = path.resolve().parent / "artifacts"
+    artifacts_dir.mkdir(parents=True, exist_ok=True)
+    return artifacts_dir / "package.duckdb"
 
-    Concrete handlers for load_csv, run_sql, and export_sql are intentionally
-    deferred to later commits.
-    """
+
+def execute_manifest(path: Path) -> tuple[list[ExecutionResult], list]:
+    """Validate, then execute supported manifest steps in order."""
     issues = validate_manifest(path)
     if issues:
         return [], issues
 
     rows = inspect_manifest(path)
     results: list[ExecutionResult] = []
+    database_path = database_path_for_manifest(path)
 
-    for row in rows:
-        results.append(
-            ExecutionResult(
-                step=row.step,
-                mode=row.mode,
-                status="pending",
-                message=f"Execution handler for {row.mode!r} is not implemented yet.",
+    # Fresh-run discipline: recreate the execution database each run.
+    if database_path.exists():
+        database_path.unlink()
+
+    connection = duckdb.connect(str(database_path))
+
+    try:
+        for row in rows:
+            if row.mode == "load_csv":
+                row_count = load_csv(
+                    connection,
+                    Path(row.resolved_input or ""),
+                    row.output_value,
+                )
+                results.append(
+                    ExecutionResult(
+                        step=row.step,
+                        mode=row.mode,
+                        status="completed",
+                        message=(
+                            f"Loaded {row_count} rows from "
+                            f"{row.input_value!r} into relation "
+                            f"{row.output_value!r}."
+                        ),
+                    )
+                )
+                continue
+
+            results.append(
+                ExecutionResult(
+                    step=row.step,
+                    mode=row.mode,
+                    status="pending",
+                    message=f"Execution handler for {row.mode!r} is not implemented yet.",
+                )
             )
-        )
+    finally:
+        connection.close()
 
     return results, []

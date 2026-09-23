@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v006
+#+VERSION: v007
 #+STARTUP: overview
 
 * Purpose
@@ -182,10 +182,46 @@ python3 run.py --run path/to/package/manifest.csv
 The current output makes it explicit that no package operations have been
 executed yet.
 
-* Current milestone
+* load_csv execution
 
-v006 corresponds to commit 006:
+The first concrete execution mode is now implemented.
+
+A manifest row such as:
 
 #+begin_example
-006 feat: add run execution skeleton
+1,load_csv,data/product.csv,source_product,source
+#+end_example
+
+means:
+
+1. resolve =data/product.csv= relative to the manifest directory
+2. create a fresh DuckDB database for the run
+3. create or replace =source_product=
+4. load the CSV with DuckDB =read_csv_auto=
+5. report the loaded row count
+
+The execution database is:
+
+#+begin_example
+artifacts/package.duckdb
+#+end_example
+
+relative to the manifest directory.
+
+Every =--run= recreates that database, preserving the fresh-run discipline.
+
+=run_sql= and =export_sql= remain pending.
+
+* Dependency
+
+#+begin_src shell
+python3 -m pip install -r requirements.txt
+#+end_src
+
+* Current milestone
+
+v007 corresponds to commit 007:
+
+#+begin_example
+007 feat: implement load_csv execution
 #+end_example

@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Manifest-driven analytical package runner.
 
-v006 adds the --run execution skeleton.
-Concrete execution handlers will be added in later commits.
+v007 implements load_csv execution with DuckDB.
 """
 
 from __future__ import annotations
@@ -10,7 +9,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from executor import execute_manifest
+from executor import database_path_for_manifest, execute_manifest
 from manifest_inspector import inspect_manifest
 from manifest_schema import AUTHORITY_ZONES, MANIFEST_COLUMNS, MODES
 from manifest_validator import validate_manifest
@@ -79,6 +78,7 @@ def print_execution_report(manifest: Path, verbose: bool) -> int:
         return 1
 
     print(f"Run for {manifest}")
+    print(f"Database: {database_path_for_manifest(manifest)}")
     print(f"Execution plan: {len(results)} {'step' if len(results) == 1 else 'steps'}.")
 
     for result in results:
@@ -87,8 +87,17 @@ def print_execution_report(manifest: Path, verbose: bool) -> int:
         print(f"  Status: {result.status}")
         print(f"  {result.message}")
 
+    pending = [result for result in results if result.status == "pending"]
+
     print()
-    print("No package operations were executed because execution handlers are not implemented yet.")
+    if pending:
+        print(
+            f"Run finished with {len(pending)} "
+            f"{'pending step' if len(pending) == 1 else 'pending steps'}."
+        )
+    else:
+        print("Run completed.")
+
     return 0
 
 
