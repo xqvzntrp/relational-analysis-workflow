@@ -257,3 +257,22 @@ Added dedicated Org-mode documentation for:
 - the Product / Attribute / Bundle example package
 
 This completes the original twelve-commit runner repository plan.
+
+
+* 013
+
+#+begin_example
+013 feat: add best-effort relation dependency discovery
+#+end_example
+
+Begins development cycle 2.
+
+Verbose dry run now discovers, where practical:
+
+- relations created by =load_csv=
+- relations created by =run_sql=
+- relations referenced by =run_sql=
+- relations referenced by =export_sql=
+
+The dependency view is descriptive only in this commit. Unresolved
+dependency validation is intentionally deferred to commit 014.

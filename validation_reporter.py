@@ -6,6 +6,7 @@ from pathlib import Path
 
 from manifest_inspector import ManifestRowInspection
 from manifest_validator import ValidationIssue
+from dependency_plan import StepDependency
 
 
 def format_issue(issue: ValidationIssue) -> str:
@@ -39,6 +40,7 @@ def format_validation_report(
     *,
     verbose: bool = False,
     inspections: list[ManifestRowInspection] | None = None,
+    dependencies: list[StepDependency] | None = None,
 ) -> str:
     """Render a complete validation report for command-line use."""
     lines: list[str] = [f"Dry run for {manifest}"]
@@ -54,6 +56,17 @@ def format_validation_report(
                 for row in inspections:
                     lines.append("")
                     lines.append(format_row_inspection(row))
+
+            if dependencies is not None:
+                lines.append("")
+                lines.append("Discovered relation dependencies:")
+                for dep in dependencies:
+                    created = ", ".join(dep.creates) if dep.creates else "(none)"
+                    referenced = ", ".join(dep.references) if dep.references else "(none)"
+                    lines.append(
+                        f"  Step {dep.step} [{dep.authority_zone}] "
+                        f"creates: {created}; references: {referenced}"
+                    )
         return "\n".join(lines)
 
     count = len(issues)

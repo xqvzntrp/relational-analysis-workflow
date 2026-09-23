@@ -298,3 +298,24 @@ It demonstrates:
 - a stable Report relation
 - CSV export
 - negative validation and runtime cases
+
+
+* Dependency discovery
+
+Verbose dry run performs best-effort relation discovery.
+
+For each manifest step, the runner may identify:
+
+- relations created
+- relations referenced
+
+For =load_csv=, the declared output relation is considered created.
+
+For =run_sql=, the runner inspects common =CREATE VIEW=, =CREATE TABLE=,
+=FROM=, and =JOIN= patterns.
+
+For =export_sql=, a simple relation input is considered referenced. Inline
+=SELECT= and =WITH= queries are inspected on a best-effort basis.
+
+Dependency discovery is informational in v013. It does not yet make an
+otherwise valid package fail.

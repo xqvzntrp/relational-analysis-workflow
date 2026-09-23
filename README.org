@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v012
+#+VERSION: v013
 #+STARTUP: overview
 
 * Purpose
@@ -383,4 +383,40 @@ v012 corresponds to commit 012:
 
 #+begin_example
 012 docs: document package contract and command-line interface
+#+end_example
+
+
+* Development cycle 2
+
+Cycle 2 begins by teaching dry run more about the analytical package itself.
+
+** Dependency discovery
+
+Verbose dry run now performs best-effort SQL relation discovery.
+
+For each manifest step it can report:
+
+- relations created
+- relations referenced
+- authority zone
+
+Example shape:
+
+#+begin_example
+Step 11 [review] creates: review_bundle;
+  references: prepared_bundle, prepared_product_bundle, prepared_product
+#+end_example
+
+This commit discovers dependencies but does not yet reject unresolved
+dependencies. Validation of those dependencies belongs to the next commit.
+
+The discovery logic is intentionally conservative and supports the SQL
+patterns used by the package. It is not intended to be a complete SQL parser.
+
+* Current milestone
+
+v013 corresponds to commit 013:
+
+#+begin_example
+013 feat: add best-effort relation dependency discovery
 #+end_example

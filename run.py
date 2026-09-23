@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Manifest-driven analytical package runner.
 
-v010 adds execution error handling and prose diagnostics.
+v013 adds best-effort dependency discovery to verbose dry run.
 """
 
 from __future__ import annotations
@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from dependency_plan import discover_manifest_dependencies
 from execution_reporter import format_execution_failure
 from executor import database_path_for_manifest, execute_manifest
 from manifest_inspector import inspect_manifest
@@ -39,12 +40,18 @@ def build_parser() -> argparse.ArgumentParser:
 def print_validation_report(manifest: Path, verbose: bool) -> int:
     issues = validate_manifest(manifest)
     inspections = inspect_manifest(manifest) if verbose and not issues else None
+    dependencies = (
+        discover_manifest_dependencies(manifest)
+        if verbose and not issues
+        else None
+    )
 
     print(format_validation_report(
         manifest,
         issues,
         verbose=verbose,
         inspections=inspections,
+        dependencies=dependencies,
     ))
 
     if not issues and verbose:
