@@ -85,3 +85,25 @@ The reporter:
 - shows internal validation types only in verbose mode
 
 This separates validation logic from presentation logic.
+
+
+* 005
+
+#+begin_example
+005 feat: add verbose dry-run reporting
+#+end_example
+
+Added verbose inspection of structurally valid manifests.
+
+Verbose dry run now reports:
+
+- manifest line number
+- step
+- mode
+- authority zone
+- input
+- output
+- resolved relative paths
+
+Relative paths are resolved from the manifest directory.
+Inspection remains separate from validation and execution.

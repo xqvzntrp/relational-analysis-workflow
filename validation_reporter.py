@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from manifest_inspector import ManifestRowInspection
 from manifest_validator import ValidationIssue
 
 
@@ -16,26 +17,50 @@ def format_issue(issue: ValidationIssue) -> str:
     )
 
 
+def format_row_inspection(row: ManifestRowInspection) -> str:
+    """Render one manifest row for verbose dry-run output."""
+    lines = [
+        f"Step {row.step} on line {row.line_number}:",
+        f"  Mode: {row.mode}",
+        f"  Authority zone: {row.authority_zone}",
+        f"  Input: {row.input_value or '(none)'}",
+        f"  Output: {row.output_value or '(none)'}",
+    ]
+    if row.resolved_input:
+        lines.append(f"  Resolved input: {row.resolved_input}")
+    if row.resolved_output:
+        lines.append(f"  Resolved output: {row.resolved_output}")
+    return "\n".join(lines)
+
+
 def format_validation_report(
     manifest: Path,
     issues: list[ValidationIssue],
     *,
     verbose: bool = False,
+    inspections: list[ManifestRowInspection] | None = None,
 ) -> str:
     """Render a complete validation report for command-line use."""
-    lines: list[str] = []
-
-    lines.append(f"Dry run for {manifest}")
+    lines: list[str] = [f"Dry run for {manifest}"]
 
     if not issues:
         lines.append("Result: ready to run.")
         if verbose:
             lines.append("No manifest validation problems were found.")
+            if inspections is not None:
+                count = len(inspections)
+                lines.append("")
+                lines.append(f"Execution plan: {count} {'step' if count == 1 else 'steps'}.")
+                for row in inspections:
+                    lines.append("")
+                    lines.append(format_row_inspection(row))
         return "\n".join(lines)
 
     count = len(issues)
-    noun = "problem" if count == 1 else "problems"
-    lines.append(f"Result: not ready to run. Found {count} {noun}.")
+    lines.append(
+        f"Result: not ready to run. Found {count} "
+        f"{'problem' if count == 1 else 'problems'}."
+    )
 
     for index, issue in enumerate(issues, start=1):
         lines.append("")

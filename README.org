@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v004
+#+VERSION: v005
 #+STARTUP: overview
 
 * Purpose
@@ -134,10 +134,34 @@ No package steps were executed.
 With =--verbose=, the report may also expose internal validation type names
 and the canonical manifest contract. The normal mode stays focused on prose.
 
+* Verbose dry-run reporting
+
+A successful verbose dry run now describes the execution plan row by row.
+
+For each manifest step it shows:
+
+- manifest line number
+- step number
+- mode
+- authority zone
+- declared input
+- declared output
+- resolved input path when present
+- resolved output path when present
+
+Relative paths are resolved from the directory containing the manifest.
+This keeps the package portable as a unit.
+
+Verbose inspection happens only after structural validation succeeds.
+
+#+begin_src shell
+python3 run.py --dry-run --verbose path/to/package/manifest.csv
+#+end_src
+
 * Current milestone
 
-v004 corresponds to commit 004:
+v005 corresponds to commit 005:
 
 #+begin_example
-004 feat: add human-readable validation reporting
+005 feat: add verbose dry-run reporting
 #+end_example
