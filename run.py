@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Manifest-driven analytical package runner.
 
-v009 implements all three execution modes with DuckDB.
+v010 adds execution error handling and prose diagnostics.
 """
 
 from __future__ import annotations
@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from execution_reporter import format_execution_failure
 from executor import database_path_for_manifest, execute_manifest
 from manifest_inspector import inspect_manifest
 from manifest_schema import AUTHORITY_ZONES, MANIFEST_COLUMNS, MODES
@@ -23,27 +24,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     mode = parser.add_mutually_exclusive_group(required=True)
-    mode.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Validate the package without executing it.",
-    )
-    mode.add_argument(
-        "--run",
-        action="store_true",
-        help="Execute the package.",
-    )
+    mode.add_argument("--dry-run", action="store_true",
+                      help="Validate the package without executing it.")
+    mode.add_argument("--run", action="store_true",
+                      help="Execute the package.")
 
-    parser.add_argument(
-        "--verbose",
-        action="store_true",
-        help="Show additional diagnostic information.",
-    )
-    parser.add_argument(
-        "manifest",
-        type=Path,
-        help="Path to the package manifest CSV.",
-    )
+    parser.add_argument("--verbose", action="store_true",
+                        help="Show additional diagnostic information.")
+    parser.add_argument("manifest", type=Path,
+                        help="Path to the package manifest CSV.")
     return parser
 
 
@@ -51,14 +40,12 @@ def print_validation_report(manifest: Path, verbose: bool) -> int:
     issues = validate_manifest(manifest)
     inspections = inspect_manifest(manifest) if verbose and not issues else None
 
-    print(
-        format_validation_report(
-            manifest,
-            issues,
-            verbose=verbose,
-            inspections=inspections,
-        )
-    )
+    print(format_validation_report(
+        manifest,
+        issues,
+        verbose=verbose,
+        inspections=inspections,
+    ))
 
     if not issues and verbose:
         print()
@@ -71,33 +58,40 @@ def print_validation_report(manifest: Path, verbose: bool) -> int:
 
 
 def print_execution_report(manifest: Path, verbose: bool) -> int:
-    results, issues = execute_manifest(manifest)
+    outcome = execute_manifest(manifest)
 
-    if issues:
-        print(format_validation_report(manifest, issues, verbose=verbose))
+    if outcome.validation_issues:
+        print(format_validation_report(
+            manifest,
+            outcome.validation_issues,
+            verbose=verbose,
+        ))
+        return 1
+
+    if outcome.execution_issue is not None:
+        print(format_execution_failure(
+            manifest,
+            completed_steps=len(outcome.results),
+            issue=outcome.execution_issue,
+            verbose=verbose,
+        ))
         return 1
 
     print(f"Run for {manifest}")
     print(f"Database: {database_path_for_manifest(manifest)}")
-    print(f"Execution plan: {len(results)} {'step' if len(results) == 1 else 'steps'}.")
+    print(
+        f"Execution plan: {len(outcome.results)} "
+        f"{'step' if len(outcome.results) == 1 else 'steps'}."
+    )
 
-    for result in results:
+    for result in outcome.results:
         print()
         print(f"Step {result.step}: {result.mode}")
         print(f"  Status: {result.status}")
         print(f"  {result.message}")
 
-    pending = [result for result in results if result.status == "pending"]
-
     print()
-    if pending:
-        print(
-            f"Run finished with {len(pending)} "
-            f"{'pending step' if len(pending) == 1 else 'pending steps'}."
-        )
-    else:
-        print("Run completed.")
-
+    print("Run completed.")
     return 0
 
 

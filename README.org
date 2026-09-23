@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v009
+#+VERSION: v010
 #+STARTUP: overview
 
 * Purpose
@@ -280,10 +280,41 @@ CSV source
   -> CSV export
 #+end_example
 
+* Execution failure handling
+
+Runtime failures are now converted into structured execution issues and
+rendered as prose.
+
+The runner stops at the first failing step. Earlier completed steps remain
+reported, while later steps are not executed.
+
+A failure report includes:
+
+- the failing step
+- the manifest mode
+- a plain-language reason
+- a corrective hint
+- the number of completed steps
+- confirmation that later steps were skipped
+
+Verbose mode additionally shows the internal execution problem type.
+
+Common categories include:
+
+- =input_missing=
+- =permission_denied=
+- =text_encoding_error=
+- =duckdb_error=
+- =invalid_execution_input=
+- =execution_error=
+
+This preserves the early-failure design during actual execution, not only
+during dry run.
+
 * Current milestone
 
-v009 corresponds to commit 009:
+v010 corresponds to commit 010:
 
 #+begin_example
-009 feat: implement export_sql execution
+010 feat: add execution error handling and prose diagnostics
 #+end_example

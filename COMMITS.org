@@ -189,3 +189,24 @@ The sample manifest now runs the complete path from CSV source through SQL
 transformation to CSV export.
 
 All three manifest execution modes are now implemented.
+
+
+* 010
+
+#+begin_example
+010 feat: add execution error handling and prose diagnostics
+#+end_example
+
+Added structured runtime error handling.
+
+The runner now:
+
+- stops at the first execution failure
+- preserves already completed step results
+- skips all later steps
+- maps common exceptions into stable problem types
+- gives a human-readable corrective hint
+- keeps verbose internal error categories optional
+
+Added a deliberately failing SQL package fixture for negative execution
+coverage.
