@@ -1,0 +1,17 @@
+step,mode,input,output,authority_zone
+1,load_csv,data/product.csv,source_product,source
+2,load_csv,data/attribute.csv,source_attribute,source
+3,load_csv,data/product_attribute.csv,source_product_attribute,source
+4,load_csv,data/bundle.csv,source_bundle,source
+5,load_csv,data/product_bundle.csv,source_product_bundle,source
+6,run_sql,sql/prepared_product.sql,,prepared
+7,run_sql,sql/prepared_attribute.sql,,prepared
+8,run_sql,sql/prepared_product_attribute.sql,,prepared
+9,run_sql,sql/prepared_bundle.sql,,prepared
+10,run_sql,sql/prepared_product_bundle.sql,,prepared
+11,run_sql,sql/review_bundle.sql,,review
+12,run_sql,sql/focused_bundle.sql,,focused
+13,run_sql,sql/inform_bundle.sql,,inform
+14,run_sql,sql/business_bundle.sql,,business
+15,run_sql,sql/report_bundle.sql,,report
+16,export_sql,report_bundle,exports/bundle_report.csv,report

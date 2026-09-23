@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v010
+#+VERSION: v011
 #+STARTUP: overview
 
 * Purpose
@@ -311,10 +311,57 @@ Common categories include:
 This preserves the early-failure design during actual execution, not only
 during dry run.
 
-* Current milestone
+* Example-package integration tests
 
-v010 corresponds to commit 010:
+The test suite now includes a complete furniture package under:
 
 #+begin_example
-010 feat: add execution error handling and prose diagnostics
+tests/resources/product_bundle_example/
+#+end_example
+
+It models:
+
+- Product
+- Attribute
+- Product Attribute
+- Bundle
+- Product Bundle
+
+The package exercises every authority zone:
+
+#+begin_example
+source
+-> prepared
+-> review
+-> focused
+-> inform
+-> business
+-> report
+#+end_example
+
+The analytical path converges on bundle grain and verifies the example
+business fact that bundle =B001= contains one sofa and two pillows.
+
+The integration fixture includes:
+
+- five source CSVs
+- Prepared SQL
+- Review SQL
+- Focused SQL
+- Inform SQL
+- Business SQL
+- a thin Report SQL view
+- one export
+- an expected report specification
+- negative manifests for invalid authority zone and missing SQL
+
+This makes the example package both documentation and an executable
+regression fixture.
+
+* Current milestone
+
+v011 corresponds to commit 011:
+
+#+begin_example
+011 test: add product bundle example package integration coverage
 #+end_example

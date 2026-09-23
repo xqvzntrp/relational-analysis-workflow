@@ -210,3 +210,30 @@ The runner now:
 
 Added a deliberately failing SQL package fixture for negative execution
 coverage.
+
+
+* 011
+
+#+begin_example
+011 test: add product bundle example package integration coverage
+#+end_example
+
+Added a complete end-to-end example package under
+=tests/resources/product_bundle_example=.
+
+The fixture includes:
+
+- Product
+- Attribute
+- Product Attribute
+- Bundle
+- Product Bundle
+- all seven authority zones
+- a bundle-grain wide Review layer
+- Focused and Inform derivations
+- Business and stable Report views
+- an expected exported report
+- negative manifests for structural and runtime failures
+
+The package now serves as documentation, integration coverage, and a
+regression fixture.

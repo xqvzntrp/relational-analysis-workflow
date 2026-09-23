@@ -1,0 +1,103 @@
+#+TITLE: Product Bundle Example Package
+#+STARTUP: overview
+
+* Purpose
+
+This package is the end-to-end integration fixture for =run.py=.
+
+It models five source relations:
+
+- Product
+- Attribute
+- Product Attribute
+- Bundle
+- Product Bundle
+
+The package then moves through the analytical authority zones:
+
+#+begin_example
+source
+-> prepared
+-> review
+-> focused
+-> inform
+-> business
+-> report
+#+end_example
+
+* Analytical grain
+
+The source data begins at several grains.
+
+The main analytical path eventually converges on one row per bundle.
+
+The =review_bundle= view is the wide analytical base at bundle grain.
+
+It adds reusable analytical columns such as:
+
+- distinct product count
+- total unit count
+- sofa count
+- pillow count
+- coffee table count
+
+=focused_bundle= adds purpose-oriented checks.
+
+=inform_bundle= adds the derived statement:
+
+#+begin_example
+sofa_with_two_pillows
+#+end_example
+
+=business_bundle= exposes the business-facing relation.
+
+=report_bundle= is intentionally thin:
+
+#+begin_src sql
+SELECT * FROM business_bundle;
+#+end_src
+
+Its purpose is to provide a stable report identifier even if the business
+view evolves later.
+
+* Run
+
+Dry run:
+
+#+begin_src shell
+python3 run.py --dry-run --verbose tests/resources/product_bundle_example/manifest.csv
+#+end_src
+
+Execute:
+
+#+begin_src shell
+python3 run.py --run tests/resources/product_bundle_example/manifest.csv
+#+end_src
+
+Expected exported artifact:
+
+#+begin_example
+tests/resources/product_bundle_example/exports/bundle_report.csv
+#+end_example
+
+* Expected business fact
+
+Bundle =B001= contains:
+
+- one sofa
+- two pillows
+- one coffee table
+
+Therefore:
+
+#+begin_example
+sofa_with_two_pillows = true
+#+end_example
+
+* Negative fixtures
+
+=manifest_invalid_zone.csv=
+tests authority-zone validation.
+
+=manifest_missing_sql.csv=
+tests runtime early failure when a declared SQL file is missing.
