@@ -393,3 +393,14 @@ Improved runtime SQL failure reporting with:
 
 Verbose diagnostics expose dependency context while the normal report stays
 focused on the corrective location.
+
+
+* 020
+
+#+begin_example
+020 feat: add deterministic artifact checks and readable csv diffs
+#+end_example
+
+Added optional =specifications/artifacts.csv= declarations, SHA-256
+deterministic comparison, readable CSV row differences, and non-zero status
+for artifact mismatches.

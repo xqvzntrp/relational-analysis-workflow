@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v019
+#+VERSION: v020
 #+STARTUP: overview
 
 * Purpose
@@ -636,4 +636,31 @@ v019 corresponds to commit 019:
 
 #+begin_example
 019 feat: add contextual SQL execution diagnostics
+#+end_example
+
+
+* Deterministic artifact checks
+
+Packages may optionally declare expected generated artifacts in:
+
+#+begin_example
+specifications/artifacts.csv
+#+end_example
+
+with:
+
+#+begin_example
+artifact,expected
+#+end_example
+
+After successful execution, generated files are compared byte-for-byte with
+checked-in expected files using SHA-256. CSV mismatches also receive a bounded
+row-oriented diff so failures remain readable.
+
+Artifact mismatch makes the command exit non-zero.
+
+* Current milestone
+
+#+begin_example
+020 feat: add deterministic artifact checks and readable csv diffs
 #+end_example

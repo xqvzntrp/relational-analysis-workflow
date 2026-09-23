@@ -445,3 +445,18 @@ Diagnostics may include:
 - relations referenced by the SQL file
 
 Dependency context is shown in verbose mode.
+
+
+* Deterministic artifact expectations
+
+A package may optionally declare:
+
+#+begin_example
+specifications/artifacts.csv
+artifact,expected
+#+end_example
+
+Both paths are package-relative. After successful execution, generated
+artifacts are compared with expected files using SHA-256. CSV differences
+also receive a bounded row-oriented report. A mismatch is a package test
+failure and returns non-zero.

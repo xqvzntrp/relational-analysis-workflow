@@ -9,6 +9,8 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from artifact_checker import check_expected_artifacts
+from artifact_spec import read_artifact_expectations
 from authority_validator import validate_authority_progression
 from dependency_plan import discover_manifest_dependencies
 from dependency_validator import validate_dependencies
@@ -129,7 +131,37 @@ def print_execution_report(manifest: Path, verbose: bool) -> int:
         print(f"  Status: {result.status}")
         print(f"  {result.message}")
 
+    expectations, artifact_spec_issues = read_artifact_expectations(manifest)
+    if artifact_spec_issues:
+        print()
+        print("Artifact specification problems:")
+        for issue in artifact_spec_issues:
+            print(f"  {issue.problem_type}: {issue.message}")
+            print(f"    What to do: {issue.hint}")
+        return 1
+
+    checks = check_expected_artifacts(manifest, expectations)
+
     print()
+    print("Deterministic artifact checks:")
+    if not checks:
+        print("  (none declared)")
+    else:
+        for check in checks:
+            status = "match" if check.matches else "DIFF"
+            print(f"  {status}: {check.artifact} (expected {check.expected})")
+            if check.matches and verbose and check.artifact_sha256:
+                print(f"    sha256: {check.artifact_sha256}")
+            if not check.matches:
+                print(f"    {check.summary}")
+                for detail in check.details:
+                    print(f"    {detail}")
+
+    print()
+    if any(not check.matches for check in checks):
+        print("Run completed, but deterministic artifact checks failed.")
+        return 1
+
     print("Run completed.")
     return 0
 

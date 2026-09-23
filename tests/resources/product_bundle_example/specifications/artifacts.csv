@@ -1,0 +1,2 @@
+artifact,expected
+exports/bundle_report.csv,specifications/expected/bundle_report.csv
