@@ -10,6 +10,7 @@ from pathlib import Path
 
 import duckdb
 
+from authority_validator import validate_authority_progression
 from dependency_validator import validate_dependencies
 from execution_errors import ExecutionIssue
 from manifest_inspector import inspect_manifest
@@ -87,6 +88,14 @@ def execute_manifest(path: Path) -> ExecutionOutcome:
         return ExecutionOutcome(
             results=[],
             validation_issues=dependency_issues,
+            execution_issue=None,
+        )
+
+    authority_issues = validate_authority_progression(path)
+    if authority_issues:
+        return ExecutionOutcome(
+            results=[],
+            validation_issues=authority_issues,
             execution_issue=None,
         )
 

@@ -8,6 +8,7 @@ from manifest_inspector import ManifestRowInspection
 from manifest_validator import ValidationIssue
 from dependency_plan import StepDependency
 from dependency_validator import DependencyIssue
+from authority_validator import AuthorityIssue
 
 
 def format_issue(issue: ValidationIssue) -> str:
@@ -21,6 +22,15 @@ def format_issue(issue: ValidationIssue) -> str:
 
 def format_dependency_issue(issue: DependencyIssue) -> str:
     """Render one dependency issue as concise prose."""
+    return (
+        f"Step {issue.step} [{issue.authority_zone}] failed because "
+        f"{issue.message}\n"
+        f"  What to do: {issue.hint}"
+    )
+
+
+def format_authority_issue(issue: AuthorityIssue) -> str:
+    """Render one authority-zone issue as concise prose."""
     return (
         f"Step {issue.step} [{issue.authority_zone}] failed because "
         f"{issue.message}\n"
@@ -52,13 +62,15 @@ def format_validation_report(
     inspections: list[ManifestRowInspection] | None = None,
     dependencies: list[StepDependency] | None = None,
     dependency_issues: list[DependencyIssue] | None = None,
+    authority_issues: list[AuthorityIssue] | None = None,
 ) -> str:
     """Render a complete validation report for command-line use."""
     lines: list[str] = [f"Dry run for {manifest}"]
 
     dependency_issues = dependency_issues or []
+    authority_issues = authority_issues or []
 
-    if not issues and not dependency_issues:
+    if not issues and not dependency_issues and not authority_issues:
         lines.append("Result: ready to run.")
         if verbose:
             lines.append("No manifest or dependency validation problems were found.")
@@ -92,6 +104,34 @@ def format_validation_report(
         for index, issue in enumerate(dependency_issues, start=1):
             lines.append("")
             lines.append(f"{index}. {format_dependency_issue(issue)}")
+            if verbose:
+                lines.append(f"  Validation type: {issue.problem_type}")
+
+        if verbose and dependencies is not None:
+            lines.append("")
+            lines.append("Discovered relation dependencies:")
+            for dep in dependencies:
+                created = ", ".join(dep.creates) if dep.creates else "(none)"
+                referenced = ", ".join(dep.references) if dep.references else "(none)"
+                lines.append(
+                    f"  Step {dep.step} [{dep.authority_zone}] "
+                    f"creates: {created}; references: {referenced}"
+                )
+
+        lines.append("")
+        lines.append("No package steps were executed.")
+        return "\n".join(lines)
+
+    if not issues and not dependency_issues and authority_issues:
+        count = len(authority_issues)
+        lines.append(
+            f"Result: not ready to run. Found {count} "
+            f"{'authority-zone problem' if count == 1 else 'authority-zone problems'}."
+        )
+
+        for index, issue in enumerate(authority_issues, start=1):
+            lines.append("")
+            lines.append(f"{index}. {format_authority_issue(issue)}")
             if verbose:
                 lines.append(f"  Validation type: {issue.problem_type}")
 

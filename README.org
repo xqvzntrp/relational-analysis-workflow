@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v014
+#+VERSION: v015
 #+STARTUP: overview
 
 * Purpose
@@ -451,4 +451,46 @@ v014 corresponds to commit 014:
 
 #+begin_example
 014 feat: validate relation dependencies before execution
+#+end_example
+
+
+* Authority-zone progression
+
+Dry run now checks the direction of relation dependencies across authority
+zones.
+
+The permitted direction is:
+
+#+begin_example
+source
+-> prepared
+-> review
+-> focused
+-> inform
+-> business
+-> report
+#+end_example
+
+A step may depend on a relation created in the same zone or an earlier
+zone.
+
+A step may not depend on a relation created in a later zone.
+
+For example, a =source= step depending on a relation produced in =business=
+is rejected as:
+
+#+begin_example
+backward_authority_dependency
+#+end_example
+
+This check is dependency-based rather than simply requiring all manifest rows
+to be grouped by zone. Independent branches can therefore remain flexible
+while the authority direction of actual dependencies stays explicit.
+
+* Current milestone
+
+v015 corresponds to commit 015:
+
+#+begin_example
+015 feat: validate authority-zone dependency progression
 #+end_example

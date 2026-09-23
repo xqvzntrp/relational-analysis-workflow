@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Manifest-driven analytical package runner.
 
-v014 validates relation dependencies before execution.
+v015 validates authority-zone dependency direction.
 """
 
 from __future__ import annotations
@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from authority_validator import validate_authority_progression
 from dependency_plan import discover_manifest_dependencies
 from dependency_validator import validate_dependencies
 from execution_reporter import format_execution_failure
@@ -41,12 +42,15 @@ def build_parser() -> argparse.ArgumentParser:
 def print_validation_report(manifest: Path, verbose: bool) -> int:
     issues = validate_manifest(manifest)
     dependency_issues = []
+    authority_issues = []
     inspections = None
     dependencies = None
 
     if not issues:
         dependencies = discover_manifest_dependencies(manifest)
         dependency_issues = validate_dependencies(manifest)
+        if not dependency_issues:
+            authority_issues = validate_authority_progression(manifest)
         if verbose:
             inspections = inspect_manifest(manifest)
 
@@ -57,16 +61,17 @@ def print_validation_report(manifest: Path, verbose: bool) -> int:
         inspections=inspections,
         dependencies=dependencies,
         dependency_issues=dependency_issues,
+        authority_issues=authority_issues,
     ))
 
-    if not issues and verbose:
+    if not issues and not dependency_issues and not authority_issues and verbose:
         print()
         print("Manifest contract:")
         print(f"  Columns: {', '.join(MANIFEST_COLUMNS)}")
         print(f"  Modes: {', '.join(MODES)}")
         print(f"  Authority zones: {', '.join(AUTHORITY_ZONES)}")
 
-    return 0 if not issues and not dependency_issues else 1
+    return 0 if not issues and not dependency_issues and not authority_issues else 1
 
 
 def print_execution_report(manifest: Path, verbose: bool) -> int:

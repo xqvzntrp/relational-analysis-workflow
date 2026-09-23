@@ -72,5 +72,19 @@ class ProductBundleExamplePackageTests(unittest.TestCase):
         )
 
 
+    def test_backward_authority_dependency_prevents_execution(self):
+        outcome = execute_manifest(
+            PACKAGE / "manifest_backward_zone.csv"
+        )
+
+        self.assertEqual([], outcome.results)
+        self.assertTrue(outcome.validation_issues)
+        self.assertIsNone(outcome.execution_issue)
+        self.assertEqual(
+            "backward_authority_dependency",
+            outcome.validation_issues[0].problem_type,
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

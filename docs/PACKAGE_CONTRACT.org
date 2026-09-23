@@ -333,3 +333,22 @@ not ready to run.
 
 The same check runs before =--run= begins execution, so an unresolved
 dependency cannot partially execute a package.
+
+
+* Authority-zone dependency direction
+
+Starting with v015, authority zones constrain dependency direction.
+
+The order is:
+
+#+begin_example
+source < prepared < review < focused < inform < business < report
+#+end_example
+
+A relation may be consumed from the same authority zone or from any later
+zone.
+
+A relation may not flow backward into an earlier authority zone.
+
+This rule is evaluated from discovered relation dependencies, not merely from
+the physical ordering of manifest rows.

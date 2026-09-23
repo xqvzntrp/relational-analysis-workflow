@@ -295,3 +295,21 @@ The runner now:
 - preserves verbose dependency inspection for diagnosis
 
 Added an unresolved-relation negative fixture and tests.
+
+
+* 015
+
+#+begin_example
+015 feat: validate authority-zone dependency progression
+#+end_example
+
+Added dependency-aware authority-zone checks.
+
+The runner now rejects a relation dependency when its producer belongs to a
+later authority zone than its consumer.
+
+Same-zone and earlier-zone dependencies remain valid.
+
+The check is based on actual relation dependencies rather than global
+manifest ordering, allowing independent analytical branches while preventing
+backward authority flow.
