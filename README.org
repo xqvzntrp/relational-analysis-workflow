@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v005
+#+VERSION: v006
 #+STARTUP: overview
 
 * Purpose
@@ -158,10 +158,34 @@ Verbose inspection happens only after structural validation succeeds.
 python3 run.py --dry-run --verbose path/to/package/manifest.csv
 #+end_src
 
+* Run execution skeleton
+
+=--run= now follows the same validate-first discipline as =--dry-run=.
+
+The flow is:
+
+1. validate the manifest
+2. stop immediately if validation fails
+3. inspect the manifest in declared order
+4. build an execution result for each step
+
+Concrete handlers are intentionally not implemented yet. Each valid step
+is reported as =pending= so the execution contract exists before any data
+movement is introduced.
+
+Example:
+
+#+begin_src shell
+python3 run.py --run path/to/package/manifest.csv
+#+end_src
+
+The current output makes it explicit that no package operations have been
+executed yet.
+
 * Current milestone
 
-v005 corresponds to commit 005:
+v006 corresponds to commit 006:
 
 #+begin_example
-005 feat: add verbose dry-run reporting
+006 feat: add run execution skeleton
 #+end_example

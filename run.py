@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Manifest-driven analytical package runner.
 
-v005 adds verbose dry-run reporting.
-Execution logic will be added in later commits.
+v006 adds the --run execution skeleton.
+Concrete execution handlers will be added in later commits.
 """
 
 from __future__ import annotations
@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from executor import execute_manifest
 from manifest_inspector import inspect_manifest
 from manifest_schema import AUTHORITY_ZONES, MANIFEST_COLUMNS, MODES
 from manifest_validator import validate_manifest
@@ -23,15 +24,27 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     mode = parser.add_mutually_exclusive_group(required=True)
-    mode.add_argument("--dry-run", action="store_true",
-                      help="Validate the package without executing it.")
-    mode.add_argument("--run", action="store_true",
-                      help="Execute the package.")
+    mode.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Validate the package without executing it.",
+    )
+    mode.add_argument(
+        "--run",
+        action="store_true",
+        help="Execute the package.",
+    )
 
-    parser.add_argument("--verbose", action="store_true",
-                        help="Show additional diagnostic information.")
-    parser.add_argument("manifest", type=Path,
-                        help="Path to the package manifest CSV.")
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Show additional diagnostic information.",
+    )
+    parser.add_argument(
+        "manifest",
+        type=Path,
+        help="Path to the package manifest CSV.",
+    )
     return parser
 
 
@@ -39,12 +52,14 @@ def print_validation_report(manifest: Path, verbose: bool) -> int:
     issues = validate_manifest(manifest)
     inspections = inspect_manifest(manifest) if verbose and not issues else None
 
-    print(format_validation_report(
-        manifest,
-        issues,
-        verbose=verbose,
-        inspections=inspections,
-    ))
+    print(
+        format_validation_report(
+            manifest,
+            issues,
+            verbose=verbose,
+            inspections=inspections,
+        )
+    )
 
     if not issues and verbose:
         print()
@@ -56,6 +71,27 @@ def print_validation_report(manifest: Path, verbose: bool) -> int:
     return 0 if not issues else 1
 
 
+def print_execution_report(manifest: Path, verbose: bool) -> int:
+    results, issues = execute_manifest(manifest)
+
+    if issues:
+        print(format_validation_report(manifest, issues, verbose=verbose))
+        return 1
+
+    print(f"Run for {manifest}")
+    print(f"Execution plan: {len(results)} {'step' if len(results) == 1 else 'steps'}.")
+
+    for result in results:
+        print()
+        print(f"Step {result.step}: {result.mode}")
+        print(f"  Status: {result.status}")
+        print(f"  {result.message}")
+
+    print()
+    print("No package operations were executed because execution handlers are not implemented yet.")
+    return 0
+
+
 def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
@@ -63,11 +99,7 @@ def main() -> int:
     if args.dry_run:
         return print_validation_report(args.manifest, args.verbose)
 
-    print(f"Run: {args.manifest}")
-    if args.verbose:
-        print("Verbose: enabled")
-    print("Status: execution not implemented yet.")
-    return 0
+    return print_execution_report(args.manifest, args.verbose)
 
 
 if __name__ == "__main__":

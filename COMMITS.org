@@ -107,3 +107,23 @@ Verbose dry run now reports:
 
 Relative paths are resolved from the manifest directory.
 Inspection remains separate from validation and execution.
+
+
+* 006
+
+#+begin_example
+006 feat: add run execution skeleton
+#+end_example
+
+Added the first =--run= execution path.
+
+The runner now:
+
+- validates before execution
+- refuses to build an execution plan when validation fails
+- walks valid manifest rows in step order
+- emits one pending execution result per manifest row
+- performs no data movement yet
+
+This establishes the execution lifecycle before concrete mode handlers are
+introduced.
