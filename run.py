@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Manifest-driven analytical package runner.
 
-v013 adds best-effort dependency discovery to verbose dry run.
+v014 validates relation dependencies before execution.
 """
 
 from __future__ import annotations
@@ -10,6 +10,7 @@ import argparse
 from pathlib import Path
 
 from dependency_plan import discover_manifest_dependencies
+from dependency_validator import validate_dependencies
 from execution_reporter import format_execution_failure
 from executor import database_path_for_manifest, execute_manifest
 from manifest_inspector import inspect_manifest
@@ -39,12 +40,15 @@ def build_parser() -> argparse.ArgumentParser:
 
 def print_validation_report(manifest: Path, verbose: bool) -> int:
     issues = validate_manifest(manifest)
-    inspections = inspect_manifest(manifest) if verbose and not issues else None
-    dependencies = (
-        discover_manifest_dependencies(manifest)
-        if verbose and not issues
-        else None
-    )
+    dependency_issues = []
+    inspections = None
+    dependencies = None
+
+    if not issues:
+        dependencies = discover_manifest_dependencies(manifest)
+        dependency_issues = validate_dependencies(manifest)
+        if verbose:
+            inspections = inspect_manifest(manifest)
 
     print(format_validation_report(
         manifest,
@@ -52,6 +56,7 @@ def print_validation_report(manifest: Path, verbose: bool) -> int:
         verbose=verbose,
         inspections=inspections,
         dependencies=dependencies,
+        dependency_issues=dependency_issues,
     ))
 
     if not issues and verbose:
@@ -61,7 +66,7 @@ def print_validation_report(manifest: Path, verbose: bool) -> int:
         print(f"  Modes: {', '.join(MODES)}")
         print(f"  Authority zones: {', '.join(AUTHORITY_ZONES)}")
 
-    return 0 if not issues else 1
+    return 0 if not issues and not dependency_issues else 1
 
 
 def print_execution_report(manifest: Path, verbose: bool) -> int:

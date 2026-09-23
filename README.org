@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v013
+#+VERSION: v014
 #+STARTUP: overview
 
 * Purpose
@@ -419,4 +419,36 @@ v013 corresponds to commit 013:
 
 #+begin_example
 013 feat: add best-effort relation dependency discovery
+#+end_example
+
+
+* Dependency validation
+
+Dry run now validates discovered relation dependencies.
+
+A referenced relation must already have been created by an earlier manifest
+step.
+
+For example, if a Review-layer SQL file contains:
+
+#+begin_src sql
+SELECT * FROM prepared_missing;
+#+end_src
+
+but no earlier step creates =prepared_missing=, dry run reports the package
+as not ready to run.
+
+The execution path uses the same dependency validation before opening the
+DuckDB execution sequence, so unresolved dependencies are blocked before
+any package steps execute.
+
+This preserves the validate-first contract while extending it from manifest
+shape to analytical relation flow.
+
+* Current milestone
+
+v014 corresponds to commit 014:
+
+#+begin_example
+014 feat: validate relation dependencies before execution
 #+end_example

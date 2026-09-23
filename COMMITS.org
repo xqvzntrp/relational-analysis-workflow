@@ -276,3 +276,22 @@ Verbose dry run now discovers, where practical:
 
 The dependency view is descriptive only in this commit. Unresolved
 dependency validation is intentionally deferred to commit 014.
+
+
+* 014
+
+#+begin_example
+014 feat: validate relation dependencies before execution
+#+end_example
+
+Added dependency validation on top of v013 discovery.
+
+The runner now:
+
+- tracks relations created by earlier manifest steps
+- reports references that are unresolved at the point of use
+- blocks =--run= before execution when dependency validation fails
+- renders dependency failures as prose with corrective hints
+- preserves verbose dependency inspection for diagnosis
+
+Added an unresolved-relation negative fixture and tests.

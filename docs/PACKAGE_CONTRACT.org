@@ -319,3 +319,17 @@ For =export_sql=, a simple relation input is considered referenced. Inline
 
 Dependency discovery is informational in v013. It does not yet make an
 otherwise valid package fail.
+
+
+* Dependency validation
+
+Starting with v014, dependency discovery participates in readiness.
+
+A relation referenced by a manifest step must be created by an earlier
+manifest step.
+
+If not, dry run reports an =unresolved_relation= problem and the package is
+not ready to run.
+
+The same check runs before =--run= begins execution, so an unresolved
+dependency cannot partially execute a package.

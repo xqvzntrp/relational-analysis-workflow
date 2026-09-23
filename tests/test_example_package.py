@@ -58,5 +58,19 @@ class ProductBundleExamplePackageTests(unittest.TestCase):
         self.assertEqual(1, len(outcome.results))
 
 
+    def test_unresolved_relation_prevents_execution(self):
+        outcome = execute_manifest(
+            PACKAGE / "manifest_unresolved_relation.csv"
+        )
+
+        self.assertEqual([], outcome.results)
+        self.assertTrue(outcome.validation_issues)
+        self.assertIsNone(outcome.execution_issue)
+        self.assertEqual(
+            "unresolved_relation",
+            outcome.validation_issues[0].problem_type,
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

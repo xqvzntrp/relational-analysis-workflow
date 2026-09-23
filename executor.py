@@ -10,6 +10,7 @@ from pathlib import Path
 
 import duckdb
 
+from dependency_validator import validate_dependencies
 from execution_errors import ExecutionIssue
 from manifest_inspector import inspect_manifest
 from manifest_validator import validate_manifest
@@ -77,6 +78,15 @@ def execute_manifest(path: Path) -> ExecutionOutcome:
         return ExecutionOutcome(
             results=[],
             validation_issues=validation_issues,
+            execution_issue=None,
+        )
+
+    dependency_issues = validate_dependencies(path)
+    if dependency_issues:
+        # Reuse the validation channel so execution never starts.
+        return ExecutionOutcome(
+            results=[],
+            validation_issues=dependency_issues,
             execution_issue=None,
         )
 
