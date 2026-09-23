@@ -429,3 +429,19 @@ specifications exist.
 
 The runtime contract validator can compare a realized DuckDB relation
 against expected columns, data types, and key uniqueness.
+
+
+* SQL execution diagnostics
+
+When a =run_sql= step fails, the runner augments the database error with
+package context where available.
+
+Diagnostics may include:
+
+- resolved SQL file path
+- SQL line number reported by DuckDB
+- text at the reported line
+- relations created by the SQL file
+- relations referenced by the SQL file
+
+Dependency context is shown in verbose mode.

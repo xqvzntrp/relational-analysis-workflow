@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v018
+#+VERSION: v019
 #+STARTUP: overview
 
 * Purpose
@@ -608,4 +608,32 @@ v018 corresponds to commit 018:
 
 #+begin_example
 018 feat: add optional relation contracts for columns keys and types
+#+end_example
+
+
+* Contextual SQL execution diagnostics
+
+SQL execution failures now carry package context rather than only the raw
+database exception.
+
+When available, the failure report includes:
+
+- SQL input file
+- DuckDB-reported SQL line number
+- source text at that line
+- relations the SQL creates
+- relations the SQL references
+
+The normal report emphasizes the file and failing line. Verbose mode adds
+the discovered relation context.
+
+This keeps runtime diagnostics aligned with the dependency-aware dry-run
+model developed earlier in cycle 2.
+
+* Current milestone
+
+v019 corresponds to commit 019:
+
+#+begin_example
+019 feat: add contextual SQL execution diagnostics
 #+end_example

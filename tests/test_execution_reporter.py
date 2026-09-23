@@ -13,6 +13,11 @@ class ExecutionReporterTests(unittest.TestCase):
             problem_type="duckdb_error",
             message="Binder Error: missing column",
             hint="Check the SQL.",
+            input_path="/package/sql/review.sql",
+            sql_line_number=7,
+            sql_line_text="FROM prepared_missing",
+            creates=("review_bundle",),
+            references=("prepared_missing",),
         )
 
         text = format_execution_failure(
@@ -28,6 +33,11 @@ class ExecutionReporterTests(unittest.TestCase):
         self.assertIn("What to do:", text)
         self.assertIn("Later manifest steps were not executed.", text)
         self.assertIn("Execution type: duckdb_error", text)
+        self.assertIn("Input: /package/sql/review.sql", text)
+        self.assertIn("SQL line: 7", text)
+        self.assertIn("SQL text: FROM prepared_missing", text)
+        self.assertIn("SQL creates: review_bundle", text)
+        self.assertIn("SQL references: prepared_missing", text)
 
 
 if __name__ == "__main__":

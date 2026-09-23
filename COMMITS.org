@@ -375,3 +375,21 @@ Contracts may declare:
 Static validation connects contracts with package-created relations and
 grain declarations. A runtime validator is included for realized schema and
 key uniqueness checks.
+
+
+* 019
+
+#+begin_example
+019 feat: add contextual SQL execution diagnostics
+#+end_example
+
+Improved runtime SQL failure reporting with:
+
+- resolved SQL file path
+- extracted SQL line number when DuckDB reports one
+- source text for the reported line
+- created-relation context
+- referenced-relation context
+
+Verbose diagnostics expose dependency context while the normal report stays
+focused on the corrective location.

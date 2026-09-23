@@ -16,6 +16,7 @@ from execution_errors import ExecutionIssue
 from manifest_inspector import inspect_manifest
 from manifest_validator import validate_manifest
 from mode_handlers import export_sql, load_csv, run_sql
+from sql_diagnostics import build_sql_failure_context
 
 
 @dataclass(frozen=True)
@@ -53,8 +54,8 @@ def _execution_issue_for_exception(row, exc: Exception) -> ExecutionIssue:
     elif isinstance(exc, duckdb.Error):
         problem_type = "duckdb_error"
         hint = (
-            "Check the SQL, relation names, column names, and dependencies created "
-            "by earlier manifest steps."
+            "Check the SQL location shown below, then verify relation names, "
+            "column names, and dependencies created by earlier manifest steps."
         )
     elif isinstance(exc, ValueError):
         problem_type = "invalid_execution_input"
@@ -63,12 +64,36 @@ def _execution_issue_for_exception(row, exc: Exception) -> ExecutionIssue:
         problem_type = "execution_error"
         hint = "Review this step's input and try the run again."
 
+    input_path = row.resolved_input
+    sql_line_number = None
+    sql_line_text = None
+    creates: tuple[str, ...] = ()
+    references: tuple[str, ...] = ()
+
+    if row.mode == "run_sql" and input_path:
+        sql_path = Path(input_path)
+        if sql_path.exists():
+            context = build_sql_failure_context(
+                sql_path,
+                str(exc) or exc.__class__.__name__,
+            )
+            input_path = str(context.sql_path)
+            sql_line_number = context.line_number
+            sql_line_text = context.line_text
+            creates = context.creates
+            references = context.references
+
     return ExecutionIssue(
         step=row.step,
         mode=row.mode,
         problem_type=problem_type,
         message=str(exc) or exc.__class__.__name__,
         hint=hint,
+        input_path=input_path,
+        sql_line_number=sql_line_number,
+        sql_line_text=sql_line_text,
+        creates=creates,
+        references=references,
     )
 
 

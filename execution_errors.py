@@ -12,3 +12,8 @@ class ExecutionIssue:
     problem_type: str
     message: str
     hint: str
+    input_path: str | None = None
+    sql_line_number: int | None = None
+    sql_line_text: str | None = None
+    creates: tuple[str, ...] = ()
+    references: tuple[str, ...] = ()
