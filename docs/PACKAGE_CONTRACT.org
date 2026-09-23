@@ -370,3 +370,35 @@ includes:
 
 It is derived from the same manifest inspection and dependency-discovery
 model used by dry-run validation.
+
+
+* Analytical grain specification
+
+A package may optionally contain:
+
+#+begin_example
+specifications/grain.csv
+#+end_example
+
+with the strict header:
+
+#+begin_example
+relation,grain
+#+end_example
+
+The =grain= field contains one or more column names. Composite grain keys are
+separated by semicolons.
+
+Examples:
+
+#+begin_example
+source_product,product_id
+source_product_attribute,product_id;attribute_id
+review_bundle,bundle_id
+#+end_example
+
+Verbose dry run combines these declarations with discovered dependencies to
+show where grain is preserved and where grain changes.
+
+Grain declarations are descriptive in v017. They prepare the package model
+for stronger relation contracts in later commits.

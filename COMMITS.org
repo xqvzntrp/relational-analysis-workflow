@@ -334,3 +334,24 @@ The summary includes:
 
 This gives dry run a concise package-level view in addition to step-level
 inspection and dependency details.
+
+
+* 017
+
+#+begin_example
+017 feat: add analytical grain declarations and dry-run reporting
+#+end_example
+
+Added optional package-level grain declarations at
+=specifications/grain.csv=.
+
+Verbose dry run can now show:
+
+- declared grain for relations
+- composite grain keys
+- grain-preserving dependencies
+- grain-changing dependencies
+
+The Product / Attribute / Bundle example declares source and analytical
+grains, making the aggregation from =bundle_id + product_id= to =bundle_id=
+visible before execution.

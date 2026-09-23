@@ -101,3 +101,38 @@ tests authority-zone validation.
 
 =manifest_missing_sql.csv=
 tests runtime early failure when a declared SQL file is missing.
+
+
+* Grain declarations
+
+The package declares analytical grain in:
+
+#+begin_example
+specifications/grain.csv
+#+end_example
+
+Examples:
+
+#+begin_example
+prepared_product_attribute -> product_id;attribute_id
+prepared_product_bundle    -> bundle_id;product_id
+review_bundle              -> bundle_id
+focused_bundle             -> bundle_id
+inform_bundle              -> bundle_id
+business_bundle            -> bundle_id
+report_bundle              -> bundle_id
+#+end_example
+
+This makes the important aggregation visible:
+
+#+begin_example
+prepared_product_bundle
+  bundle_id + product_id
+        |
+        v
+review_bundle
+  bundle_id
+#+end_example
+
+After Review, the bundle grain is preserved through Focused, Inform,
+Business, and Report.

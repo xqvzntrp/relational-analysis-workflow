@@ -1,0 +1,16 @@
+relation,grain
+source_product,product_id
+source_attribute,attribute_id
+source_product_attribute,product_id;attribute_id
+source_bundle,bundle_id
+source_product_bundle,bundle_id;product_id
+prepared_product,product_id
+prepared_attribute,attribute_id
+prepared_product_attribute,product_id;attribute_id
+prepared_bundle,bundle_id
+prepared_product_bundle,bundle_id;product_id
+review_bundle,bundle_id
+focused_bundle,bundle_id
+inform_bundle,bundle_id
+business_bundle,bundle_id
+report_bundle,bundle_id

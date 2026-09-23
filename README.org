@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v016
+#+VERSION: v017
 #+STARTUP: overview
 
 * Purpose
@@ -521,4 +521,54 @@ v016 corresponds to commit 016:
 
 #+begin_example
 016 feat: add package summary to verbose dry run
+#+end_example
+
+
+* Analytical grain declarations
+
+Packages may now optionally declare relation grain in:
+
+#+begin_example
+specifications/grain.csv
+#+end_example
+
+The schema is:
+
+#+begin_example
+relation,grain
+#+end_example
+
+Composite keys use semicolons:
+
+#+begin_example
+prepared_product_attribute,product_id;attribute_id
+#+end_example
+
+Verbose dry run reports declared grain and observed grain transitions across
+known relation dependencies.
+
+For the furniture example, this makes the key analytical transition explicit:
+
+#+begin_example
+prepared_product_bundle
+grain: bundle_id + product_id
+
+        -> review_bundle
+
+grain: bundle_id
+#+end_example
+
+The bundle grain is then preserved through Focused, Inform, Business, and
+Report.
+
+Grain declarations are optional in v017. Malformed grain specifications are
+reported in verbose output, but grain is not yet a mandatory relation
+contract.
+
+* Current milestone
+
+v017 corresponds to commit 017:
+
+#+begin_example
+017 feat: add analytical grain declarations and dry-run reporting
 #+end_example

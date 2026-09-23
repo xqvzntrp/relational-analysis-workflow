@@ -10,6 +10,7 @@ from dependency_plan import StepDependency
 from dependency_validator import DependencyIssue
 from authority_validator import AuthorityIssue
 from package_summary import PackageSummary
+from grain_analysis import GrainAnalysis
 
 
 def format_issue(issue: ValidationIssue) -> str:
@@ -65,6 +66,7 @@ def format_validation_report(
     dependency_issues: list[DependencyIssue] | None = None,
     authority_issues: list[AuthorityIssue] | None = None,
     package_summary: PackageSummary | None = None,
+    grain_analysis: GrainAnalysis | None = None,
 ) -> str:
     """Render a complete validation report for command-line use."""
     lines: list[str] = [f"Dry run for {manifest}"]
@@ -119,6 +121,40 @@ def format_validation_report(
                 lines.append(f"  Relations created: {created}")
                 lines.append(f"  Final created relations: {final_created}")
                 lines.append(f"  Export outputs: {exports}")
+
+            if grain_analysis is not None:
+                lines.append("")
+                lines.append("Declared analytical grain:")
+                if not grain_analysis.declarations:
+                    lines.append("  (none)")
+                else:
+                    for declaration in grain_analysis.declarations:
+                        lines.append(
+                            f"  {declaration.relation}: "
+                            f"{', '.join(declaration.keys)}"
+                        )
+
+                if grain_analysis.transitions:
+                    lines.append("")
+                    lines.append("Observed grain transitions:")
+                    for transition in grain_analysis.transitions:
+                        status = "changed" if transition.changed else "preserved"
+                        lines.append(
+                            f"  Step {transition.step} [{transition.authority_zone}] "
+                            f"{transition.upstream_relation} "
+                            f"({', '.join(transition.upstream_grain)}) -> "
+                            f"{transition.relation} "
+                            f"({', '.join(transition.grain)}): {status}"
+                        )
+
+                if grain_analysis.issues:
+                    lines.append("")
+                    lines.append("Grain specification warnings:")
+                    for issue in grain_analysis.issues:
+                        lines.append(
+                            f"  {issue.problem_type}: {issue.message} "
+                            f"What to do: {issue.hint}"
+                        )
         return "\n".join(lines)
 
     if not issues and dependency_issues:

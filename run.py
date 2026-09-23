@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Manifest-driven analytical package runner.
 
-v016 adds a package summary to successful verbose dry run.
+v017 adds optional grain declarations and grain-aware dry-run reporting.
 """
 
 from __future__ import annotations
@@ -16,6 +16,7 @@ from execution_reporter import format_execution_failure
 from executor import database_path_for_manifest, execute_manifest
 from manifest_inspector import inspect_manifest
 from manifest_schema import AUTHORITY_ZONES, MANIFEST_COLUMNS, MODES
+from grain_analysis import analyze_grain
 from manifest_validator import validate_manifest
 from package_summary import summarize_package
 from validation_reporter import format_validation_report
@@ -47,6 +48,7 @@ def print_validation_report(manifest: Path, verbose: bool) -> int:
     inspections = None
     dependencies = None
     summary = None
+    grain_analysis = None
 
     if not issues:
         dependencies = discover_manifest_dependencies(manifest)
@@ -56,6 +58,7 @@ def print_validation_report(manifest: Path, verbose: bool) -> int:
         if verbose:
             inspections = inspect_manifest(manifest)
             summary = summarize_package(manifest)
+            grain_analysis = analyze_grain(manifest)
 
     print(format_validation_report(
         manifest,
@@ -66,6 +69,7 @@ def print_validation_report(manifest: Path, verbose: bool) -> int:
         dependency_issues=dependency_issues,
         authority_issues=authority_issues,
         package_summary=summary,
+        grain_analysis=grain_analysis,
     ))
 
     if not issues and not dependency_issues and not authority_issues and verbose:
