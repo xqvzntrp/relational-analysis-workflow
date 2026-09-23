@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v023
+#+VERSION: v024
 #+STARTUP: overview
 
 * Purpose
@@ -743,4 +743,46 @@ are deterministic golden artifacts checked by =--test=.
 
 #+begin_example
 023 feat: add review analytical-base export to product bundle example
+#+end_example
+
+
+* Cycle 2 complete
+
+Cycle 2 is now documented and frozen at v024.
+
+Cycle 1 answered:
+
+#+begin_quote
+Can I execute this package?
+#+end_quote
+
+Cycle 2 answers:
+
+#+begin_quote
+Do I understand this package before I execute it, and can I verify what it
+produces after execution?
+#+end_quote
+
+The complete Cycle 2 contract is documented in:
+
+#+begin_example
+docs/CYCLE_2_CONTRACT.org
+#+end_example
+
+and the review checklist is:
+
+#+begin_example
+docs/CYCLE_2_CHECKLIST.org
+#+end_example
+
+The frozen surface includes dependency discovery and validation,
+authority-zone progression, package summaries, grain declarations, relation
+contracts, contextual SQL diagnostics, deterministic artifact checks,
+machine-readable dry run, package-level testing, and the two-product
+product-bundle reference example.
+
+* Current milestone
+
+#+begin_example
+024 docs: freeze cycle 2 analysis contract
 #+end_example

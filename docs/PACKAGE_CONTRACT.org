@@ -480,3 +480,10 @@ It combines:
 
 A preflight failure prevents execution. Any later contract or artifact
 failure causes the package test to fail.
+
+
+* Cycle 2 freeze
+
+The consolidated frozen Cycle 2 contract is documented in
+=CYCLE_2_CONTRACT.org=. Future contract-breaking changes should be explicit
+and versioned rather than silently changing the v024 semantics.

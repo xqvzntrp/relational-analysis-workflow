@@ -1,0 +1,37 @@
+#+TITLE: Cycle 2 Package Checklist
+
+* Before execution
+
+- [ ] Manifest has exact required columns.
+- [ ] Steps are unique positive integers.
+- [ ] Modes are recognized.
+- [ ] Authority zones are recognized.
+- [ ] Referenced files exist.
+- [ ] Relation dependencies resolve to earlier producers.
+- [ ] Dependencies do not move backward through authority zones.
+- [ ] Grain declarations, when present, parse cleanly.
+- [ ] Relation contracts, when present, are internally consistent.
+- [ ] Artifact expectations, when present, parse cleanly.
+
+* During execution
+
+- [ ] A fresh package DuckDB database is created.
+- [ ] Manifest steps execute in order.
+- [ ] First execution failure stops later steps.
+- [ ] SQL failures report contextual file/line information when available.
+
+* After execution
+
+- [ ] Declared relation columns exist.
+- [ ] Declared relation types match.
+- [ ] Declared keys are unique.
+- [ ] Declared deterministic artifacts exist.
+- [ ] Generated artifacts match expected artifacts.
+- [ ] Package test reports PASS only if all required checks pass.
+
+* Reference example
+
+- [ ] =review_bundle= is at =bundle_id= grain.
+- [ ] Review exports =bundle_analytical_base.csv=.
+- [ ] Report exports =bundle_report.csv=.
+- [ ] Both exports have deterministic expected artifacts.

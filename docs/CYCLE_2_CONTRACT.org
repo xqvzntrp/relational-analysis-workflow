@@ -1,0 +1,297 @@
+#+TITLE: Cycle 2 Analysis Contract
+#+OPTIONS: toc:2
+
+* Purpose
+
+Cycle 1 established that a manifest-driven analytical package can be
+validated and executed.
+
+Cycle 2 establishes that the package can be understood and tested before it
+is trusted.
+
+The frozen Cycle 2 question is:
+
+#+begin_quote
+Do I understand this package before I execute it, and can I verify what it
+produces after execution?
+#+end_quote
+
+* Frozen package model
+
+A package is rooted at the directory containing its manifest.
+
+The manifest schema remains:
+
+#+begin_example
+step,mode,input,output,authority_zone
+#+end_example
+
+Supported modes remain:
+
+- =load_csv=
+- =run_sql=
+- =export_sql=
+
+Authority zones remain:
+
+- =source=
+- =prepared=
+- =review=
+- =focused=
+- =inform=
+- =business=
+- =report=
+
+Relative paths are resolved from the manifest directory.
+
+Every execution rebuilds =artifacts/package.duckdb=.
+
+* Authority-zone semantics
+
+The zones are analytical authority boundaries, not merely execution phases.
+
+** Source
+
+Loaded source data.
+
+** Prepared
+
+Structural normalization and join readiness.
+
+** Review
+
+The broad reusable analytical base at stable grain.
+
+Review is explicitly a consumable analytical product. The product-bundle
+example exports =review_bundle= as =bundle_analytical_base.csv=.
+
+** Focused
+
+Purpose-oriented narrowing and checks over Review.
+
+** Inform
+
+Derived analytical meaning and interpretation.
+
+** Business
+
+Business-facing interpretation and presentation.
+
+** Report
+
+A thin, stable downstream identifier for final consumption.
+
+* Dependency contract
+
+Dry run performs best-effort SQL relation discovery.
+
+For each manifest step the runner can describe:
+
+- relations created
+- relations referenced
+
+A referenced relation must have been created by an earlier manifest step.
+
+Authority progression is dependency-based rather than globally ordered.
+Independent branches may use zones flexibly, but a relation may not depend on
+a producer from a later semantic authority zone.
+
+* Grain contract
+
+A package may declare analytical grain in:
+
+#+begin_example
+specifications/grain.csv
+#+end_example
+
+with:
+
+#+begin_example
+relation,grain
+#+end_example
+
+Composite keys use semicolons.
+
+Grain declarations make changes in analytical grain visible during verbose
+dry run. In the product-bundle example, =prepared_product_bundle= changes
+from =bundle_id + product_id= grain to =bundle_id= grain at =review_bundle=,
+then that bundle grain is preserved downstream.
+
+* Relation contract
+
+A package may declare relation columns, types, and keys in:
+
+#+begin_example
+specifications/relation_contract.csv
+#+end_example
+
+with:
+
+#+begin_example
+relation,column,data_type,key
+#+end_example
+
+Static validation checks declaration consistency. Package testing checks
+realized DuckDB schemas, declared types, and key uniqueness after execution.
+
+* Artifact contract
+
+A package may declare deterministic expected artifacts in:
+
+#+begin_example
+specifications/artifacts.csv
+#+end_example
+
+with:
+
+#+begin_example
+artifact,expected
+#+end_example
+
+Generated and expected files are compared byte-for-byte using SHA-256.
+CSV mismatches receive a bounded row-oriented difference report.
+
+The product-bundle example checks both:
+
+- =exports/bundle_analytical_base.csv=
+- =exports/bundle_report.csv=
+
+* Dry-run contract
+
+Human-readable dry run:
+
+#+begin_example
+python3 run.py --dry-run MANIFEST
+python3 run.py --dry-run --verbose MANIFEST
+#+end_example
+
+Machine-readable dry run:
+
+#+begin_example
+python3 run.py --dry-run --json MANIFEST
+python3 run.py --dry-run --verbose --json MANIFEST
+#+end_example
+
+The JSON contract uses =schema_version= 1.
+
+Base JSON contains:
+
+- manifest
+- ready
+- categorized issues
+
+Verbose JSON additionally contains:
+
+- steps
+- dependencies
+- package summary
+- grain analysis
+- relation contracts
+
+The process exits zero only when the package is ready.
+
+* Execution diagnostic contract
+
+When SQL execution fails, diagnostics retain manifest-step context and may
+include:
+
+- SQL input path
+- DuckDB-reported line number
+- source text at that line
+- created relations
+- referenced relations
+
+Verbose reporting exposes dependency context.
+
+* Package test contract
+
+The acceptance command is:
+
+#+begin_example
+python3 run.py --test MANIFEST
+#+end_example
+
+It performs:
+
+1. static manifest validation
+2. dependency validation
+3. authority-zone dependency validation
+4. grain specification validation
+5. relation-contract declaration validation
+6. artifact-specification validation
+7. fresh package execution
+8. realized relation contract checks
+9. deterministic artifact checks
+
+A preflight failure prevents execution.
+
+The final result is:
+
+#+begin_example
+PACKAGE TEST: PASS
+#+end_example
+
+or:
+
+#+begin_example
+PACKAGE TEST: FAIL
+#+end_example
+
+with matching process status.
+
+* Product-bundle reference package
+
+The built-in product-bundle package remains the Cycle 2 reference example.
+
+Its source relational model is:
+
+- =product=
+- =attribute=
+- =product_attribute=
+- =bundle=
+- =product_bundle=
+
+Quantity belongs on =product_bundle= because it describes product membership
+within a bundle.
+
+Bundle-wide listing metadata belongs on =bundle=.
+
+The example demonstrates all authority zones and has two exported products:
+
+** Analytical base
+
+#+begin_example
+review_bundle
+  -> exports/bundle_analytical_base.csv
+#+end_example
+
+at =bundle_id= grain.
+
+** Business report
+
+#+begin_example
+report_bundle
+  -> exports/bundle_report.csv
+#+end_example
+
+also at =bundle_id= grain after Focused, Inform, and Business interpretation.
+
+* Cycle 2 frozen surface
+
+At v024 the following are treated as the documented Cycle 2 contract:
+
+- manifest schema and modes
+- authority-zone vocabulary and dependency direction
+- package-relative path semantics
+- fresh-run database discipline
+- best-effort relation dependency discovery
+- optional grain declarations
+- optional relation contracts
+- contextual SQL diagnostics
+- optional deterministic artifact expectations
+- JSON dry-run schema version 1
+- package-level test lifecycle
+- product-bundle reference example with Review and Report exports
+
+Future versions may extend these surfaces, but should avoid silently changing
+their meaning. Contract-breaking changes should be explicit and versioned.
