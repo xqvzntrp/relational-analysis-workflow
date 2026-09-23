@@ -45,3 +45,24 @@ def load_csv(
     ).fetchone()[0]
 
     return int(row_count)
+
+
+def run_sql(
+    connection: duckdb.DuckDBPyConnection,
+    sql_path: Path,
+) -> None:
+    """Execute the complete contents of a SQL file."""
+    sql_path = sql_path.resolve()
+
+    if not sql_path.exists():
+        raise FileNotFoundError(f"SQL input does not exist: {sql_path}")
+
+    if not sql_path.is_file():
+        raise ValueError(f"SQL input is not a file: {sql_path}")
+
+    sql_text = sql_path.read_text(encoding="utf-8").strip()
+
+    if not sql_text:
+        raise ValueError(f"SQL input is empty: {sql_path}")
+
+    connection.execute(sql_text)

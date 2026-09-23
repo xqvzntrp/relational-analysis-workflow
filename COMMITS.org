@@ -146,3 +146,24 @@ Added the first concrete manifest mode.
 - reports the loaded row count
 
 Added =duckdb= to =requirements.txt= and added CSV execution fixtures/tests.
+
+
+* 008
+
+#+begin_example
+008 feat: implement run_sql execution
+#+end_example
+
+Added the second concrete manifest mode.
+
+=run_sql= now:
+
+- resolves SQL files relative to the manifest
+- reads UTF-8 SQL text
+- rejects empty SQL files
+- executes SQL against the current DuckDB connection
+- allows later SQL layers to depend on relations created by earlier steps
+
+The SQL file owns the names of any views or tables it creates.
+
+Added a Prepared-layer SQL fixture and tests.

@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v007
+#+VERSION: v008
 #+STARTUP: overview
 
 * Purpose
@@ -218,10 +218,36 @@ Every =--run= recreates that database, preserving the fresh-run discipline.
 python3 -m pip install -r requirements.txt
 #+end_src
 
-* Current milestone
+* run_sql execution
 
-v007 corresponds to commit 007:
+The second concrete execution mode is now implemented.
+
+A manifest row such as:
 
 #+begin_example
-007 feat: implement load_csv execution
+2,run_sql,sql/prepared_product.sql,,prepared
+#+end_example
+
+means:
+
+1. resolve the SQL file relative to the manifest directory
+2. read the SQL file as UTF-8 text
+3. reject an empty SQL file
+4. execute the SQL against the same DuckDB connection used by prior steps
+5. preserve objects created by earlier steps in the same run
+
+This makes layered SQL possible. For example, step 1 can load
+=source_product= and step 2 can create =prepared_product= from it.
+
+The =output= column is intentionally unused for =run_sql= because the SQL
+file itself owns the names of the relations it creates.
+
+=export_sql= remains pending.
+
+* Current milestone
+
+v008 corresponds to commit 008:
+
+#+begin_example
+008 feat: implement run_sql execution
 #+end_example

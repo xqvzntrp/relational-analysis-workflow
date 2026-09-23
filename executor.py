@@ -1,6 +1,6 @@
 """Execution engine for manifest-driven packages.
 
-v007 implements the load_csv mode.
+v008 implements load_csv and run_sql.
 """
 
 from __future__ import annotations
@@ -12,7 +12,7 @@ import duckdb
 
 from manifest_inspector import inspect_manifest
 from manifest_validator import validate_manifest
-from mode_handlers import load_csv
+from mode_handlers import load_csv, run_sql
 
 
 @dataclass(frozen=True)
@@ -64,6 +64,21 @@ def execute_manifest(path: Path) -> tuple[list[ExecutionResult], list]:
                             f"{row.input_value!r} into relation "
                             f"{row.output_value!r}."
                         ),
+                    )
+                )
+                continue
+
+            if row.mode == "run_sql":
+                run_sql(
+                    connection,
+                    Path(row.resolved_input or ""),
+                )
+                results.append(
+                    ExecutionResult(
+                        step=row.step,
+                        mode=row.mode,
+                        status="completed",
+                        message=f"Executed SQL file {row.input_value!r}.",
                     )
                 )
                 continue

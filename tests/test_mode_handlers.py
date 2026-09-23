@@ -3,7 +3,7 @@ import unittest
 
 import duckdb
 
-from mode_handlers import load_csv
+from mode_handlers import load_csv, run_sql
 
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -56,6 +56,46 @@ class LoadCsvTests(unittest.TestCase):
             )
         finally:
             connection.close()
+
+
+class RunSqlTests(unittest.TestCase):
+    def test_run_sql_executes_sql_file(self):
+        connection = duckdb.connect(":memory:")
+        try:
+            load_csv(
+                connection,
+                FIXTURES / "data" / "product.csv",
+                "source_product",
+            )
+
+            run_sql(
+                connection,
+                FIXTURES / "sql" / "prepared_product.sql",
+            )
+
+            rows = connection.execute(
+                "SELECT product_id, product_name_upper "
+                "FROM prepared_product ORDER BY product_id"
+            ).fetchall()
+
+            self.assertEqual(
+                [("P001", "SOFA"), ("P002", "COFFEE TABLE")],
+                rows,
+            )
+        finally:
+            connection.close()
+
+    def test_run_sql_rejects_empty_file(self):
+        empty_sql = FIXTURES / "sql" / "empty.sql"
+        empty_sql.write_text("", encoding="utf-8")
+
+        connection = duckdb.connect(":memory:")
+        try:
+            with self.assertRaises(ValueError):
+                run_sql(connection, empty_sql)
+        finally:
+            connection.close()
+            empty_sql.unlink(missing_ok=True)
 
 
 if __name__ == "__main__":
