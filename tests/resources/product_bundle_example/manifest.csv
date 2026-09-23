@@ -10,8 +10,9 @@ step,mode,input,output,authority_zone
 9,run_sql,sql/prepared_bundle.sql,,prepared
 10,run_sql,sql/prepared_product_bundle.sql,,prepared
 11,run_sql,sql/review_bundle.sql,,review
-12,run_sql,sql/focused_bundle.sql,,focused
-13,run_sql,sql/inform_bundle.sql,,inform
-14,run_sql,sql/business_bundle.sql,,business
-15,run_sql,sql/report_bundle.sql,,report
-16,export_sql,report_bundle,exports/bundle_report.csv,report
+12,export_sql,review_bundle,exports/bundle_analytical_base.csv,review
+13,run_sql,sql/focused_bundle.sql,,focused
+14,run_sql,sql/inform_bundle.sql,,inform
+15,run_sql,sql/business_bundle.sql,,business
+16,run_sql,sql/report_bundle.sql,,report
+17,export_sql,report_bundle,exports/bundle_report.csv,report

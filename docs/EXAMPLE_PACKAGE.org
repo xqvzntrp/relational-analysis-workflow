@@ -101,3 +101,19 @@ specifications/expected_report.csv
 #+end_example
 
 That file acts as an executable specification for integration testing.
+
+
+* Exported analytical products
+
+The example deliberately exports two products from different authority zones.
+
+=exports/bundle_analytical_base.csv= is exported directly from =review_bundle=
+at =bundle_id= grain. It is the broad reusable analytical product, containing
+the bundle-wide listing identifier and reusable product/unit counts.
+
+=exports/bundle_report.csv= is exported from =report_bundle= after Focused,
+Inform, and Business add purpose-specific and interpreted meaning.
+
+This demonstrates that Review is a consumable analytical product rather than
+only an implementation step. Both outputs have deterministic expected
+artifacts under =specifications/expected/=.

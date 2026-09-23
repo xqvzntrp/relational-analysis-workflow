@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v022
+#+VERSION: v023
 #+STARTUP: overview
 
 * Purpose
@@ -723,4 +723,24 @@ cycle 2 into one package-facing test operation.
 
 #+begin_example
 022 feat: add package-level test command
+#+end_example
+
+
+* Product bundle analytical-base export
+
+The furniture example remains inside this package and now exports:
+
+#+begin_example
+exports/bundle_analytical_base.csv
+exports/bundle_report.csv
+#+end_example
+
+The first comes directly from =review_bundle= and preserves its stable
+=bundle_id= grain. The second remains the final Report-layer product. Both
+are deterministic golden artifacts checked by =--test=.
+
+* Current milestone
+
+#+begin_example
+023 feat: add review analytical-base export to product bundle example
 #+end_example

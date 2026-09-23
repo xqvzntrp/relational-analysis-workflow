@@ -10,7 +10,9 @@ class ArtifactCheckerTests(unittest.TestCase):
     def test_example_expectation_is_declared(self):
         expectations, issues = read_artifact_expectations(PACKAGE / "manifest.csv")
         self.assertEqual([], issues)
-        self.assertEqual("exports/bundle_report.csv", expectations[0].artifact)
+        self.assertEqual(2, len(expectations))
+        self.assertEqual("exports/bundle_analytical_base.csv", expectations[0].artifact)
+        self.assertEqual("exports/bundle_report.csv", expectations[1].artifact)
 
     def test_matching_csv(self):
         with tempfile.TemporaryDirectory() as d:

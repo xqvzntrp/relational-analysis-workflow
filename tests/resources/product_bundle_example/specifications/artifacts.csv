@@ -1,2 +1,3 @@
 artifact,expected
+exports/bundle_analytical_base.csv,specifications/expected/bundle_analytical_base.csv
 exports/bundle_report.csv,specifications/expected/bundle_report.csv

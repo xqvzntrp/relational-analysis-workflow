@@ -427,3 +427,13 @@ Added =--test= as a first-class package operation.
 The test lifecycle combines preflight validation, fresh execution, runtime
 relation-contract checks, and deterministic artifact comparison into one
 pass/fail command suitable for local development and CI.
+
+
+* 023
+
+#+begin_example
+023 feat: add review analytical-base export to product bundle example
+#+end_example
+
+Kept the furniture example in the runner package and added a deterministic
+Review-layer analytical-base export alongside the final Report export.

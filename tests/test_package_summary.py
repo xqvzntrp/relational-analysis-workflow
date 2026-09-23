@@ -11,7 +11,7 @@ class PackageSummaryTests(unittest.TestCase):
     def test_example_package_summary(self):
         summary = summarize_package(PACKAGE / "manifest.csv")
 
-        self.assertEqual(16, summary.step_count)
+        self.assertEqual(17, summary.step_count)
         self.assertEqual(5, summary.mode_counts["load_csv"])
         self.assertEqual(10, summary.mode_counts["run_sql"])
         self.assertEqual(1, summary.mode_counts["export_sql"])

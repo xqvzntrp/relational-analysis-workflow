@@ -13,7 +13,7 @@ class DryRunJsonTests(unittest.TestCase):
 
     def test_verbose_contains_analysis_model(self):
         d = build_dry_run_document(PACKAGE / "manifest.csv", verbose=True)
-        self.assertEqual(16, d["summary"]["step_count"])
+        self.assertEqual(17, d["summary"]["step_count"])
         self.assertTrue(d["steps"])
         self.assertTrue(d["dependencies"])
         self.assertTrue(d["grain"]["declarations"])
