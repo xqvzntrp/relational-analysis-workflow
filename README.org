@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v020
+#+VERSION: v021
 #+STARTUP: overview
 
 * Purpose
@@ -663,4 +663,27 @@ Artifact mismatch makes the command exit non-zero.
 
 #+begin_example
 020 feat: add deterministic artifact checks and readable csv diffs
+#+end_example
+
+
+* Machine-readable dry run
+
+Dry run now supports:
+
+#+begin_example
+python3 run.py --dry-run --json MANIFEST
+python3 run.py --dry-run --verbose --json MANIFEST
+#+end_example
+
+The versioned JSON document always includes readiness and categorized issues.
+Verbose JSON additionally includes steps, dependencies, package summary,
+grain analysis, and relation contracts.
+
+=--json= is restricted to dry run in v021. Exit status remains aligned with
+the =ready= value.
+
+* Current milestone
+
+#+begin_example
+021 feat: add machine-readable json dry-run output
 #+end_example

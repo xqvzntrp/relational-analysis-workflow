@@ -7,6 +7,7 @@ v018 adds optional relation contracts for columns, keys, and types.
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
 from artifact_checker import check_expected_artifacts
@@ -14,6 +15,7 @@ from artifact_spec import read_artifact_expectations
 from authority_validator import validate_authority_progression
 from dependency_plan import discover_manifest_dependencies
 from dependency_validator import validate_dependencies
+from dry_run_json import build_dry_run_document
 from execution_reporter import format_execution_failure
 from executor import database_path_for_manifest, execute_manifest
 from manifest_inspector import inspect_manifest
@@ -40,6 +42,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     parser.add_argument("--verbose", action="store_true",
                         help="Show additional diagnostic information.")
+    parser.add_argument("--json", action="store_true",
+                        help="Emit dry-run results as machine-readable JSON.")
     parser.add_argument("manifest", type=Path,
                         help="Path to the package manifest CSV.")
     return parser
@@ -169,6 +173,13 @@ def print_execution_report(manifest: Path, verbose: bool) -> int:
 def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
+
+    if args.json:
+        if not args.dry_run:
+            parser.error("--json is only valid with --dry-run")
+        document = build_dry_run_document(args.manifest, verbose=args.verbose)
+        print(json.dumps(document, indent=2, sort_keys=True))
+        return 0 if document["ready"] else 1
 
     if args.dry_run:
         return print_validation_report(args.manifest, args.verbose)

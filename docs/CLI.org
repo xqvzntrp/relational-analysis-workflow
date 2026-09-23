@@ -137,3 +137,14 @@ python3 -m pip install -r requirements.txt
 #+end_src
 
 The current runtime dependency is DuckDB.
+
+
+* JSON dry run
+
+#+begin_example
+python3 run.py --dry-run --json MANIFEST
+python3 run.py --dry-run --verbose --json MANIFEST
+#+end_example
+
+JSON output uses =schema_version= 1 and returns exit status 0 only when
+=ready=true=. =--json= is valid only with =--dry-run=.

@@ -404,3 +404,13 @@ focused on the corrective location.
 Added optional =specifications/artifacts.csv= declarations, SHA-256
 deterministic comparison, readable CSV row differences, and non-zero status
 for artifact mismatches.
+
+
+* 021
+
+#+begin_example
+021 feat: add machine-readable json dry-run output
+#+end_example
+
+Added a versioned JSON dry-run contract. Base output contains readiness and
+categorized issues; verbose output adds the package analysis model.
