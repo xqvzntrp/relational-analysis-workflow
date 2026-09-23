@@ -475,3 +475,18 @@ The reconstructed commit timestamps are synthetic bookkeeping timestamps;
 they do not claim to reproduce original historical commit times.
 
 No runner or analytical behavior changed in v025.
+
+
+* 026
+
+#+begin_example
+026 fix: make dry run independent of duckdb runtime
+#+end_example
+
+Removed execution-only DuckDB imports from the dry-run import path. Dry-run
+analysis, including verbose and JSON forms, now works without DuckDB
+installed. Added regression coverage that actively blocks DuckDB imports.
+
+=--run= and execution-capable package testing retain DuckDB as an explicit
+runtime dependency and provide a concise installation diagnostic when the
+runtime is absent.

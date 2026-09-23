@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v025
+#+VERSION: v026
 #+STARTUP: overview
 
 * Purpose
@@ -816,4 +816,29 @@ v024 Cycle 2 behavior.
 
 #+begin_example
 025 chore: establish real git repository history
+#+end_example
+
+
+* Dry run without DuckDB
+
+Starting with v026, dry run is a pure package-analysis operation and does not
+require the DuckDB Python package to be installed.
+
+These commands work without DuckDB:
+
+#+begin_example
+python3 run.py --dry-run MANIFEST
+python3 run.py --dry-run --verbose MANIFEST
+python3 run.py --dry-run --json MANIFEST
+python3 run.py --dry-run --verbose --json MANIFEST
+#+end_example
+
+Execution remains a runtime boundary. =--run= and a package test that reaches
+execution require DuckDB and report the installation command when it is
+missing.
+
+* Current milestone
+
+#+begin_example
+026 fix: make dry run independent of duckdb runtime
 #+end_example

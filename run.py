@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Manifest-driven analytical package runner.
 
-v018 adds optional relation contracts for columns, keys, and types.
+v026 keeps dry-run package analysis independent of the DuckDB runtime.
 """
 
 from __future__ import annotations
@@ -16,15 +16,11 @@ from authority_validator import validate_authority_progression
 from dependency_plan import discover_manifest_dependencies
 from dependency_validator import validate_dependencies
 from dry_run_json import build_dry_run_document
-from execution_reporter import format_execution_failure
-from executor import database_path_for_manifest, execute_manifest
 from manifest_inspector import inspect_manifest
 from manifest_schema import AUTHORITY_ZONES, MANIFEST_COLUMNS, MODES
 from grain_analysis import analyze_grain
 from manifest_validator import validate_manifest
 from package_summary import summarize_package
-from package_tester import test_package
-from package_test_reporter import format_package_test_report
 from relation_contract import read_relation_contract
 from relation_contract_validator import validate_contract_declarations
 from validation_reporter import format_validation_report
@@ -107,6 +103,18 @@ def print_validation_report(manifest: Path, verbose: bool) -> int:
 
 
 def print_execution_report(manifest: Path, verbose: bool) -> int:
+    try:
+        from execution_reporter import format_execution_failure
+        from executor import database_path_for_manifest, execute_manifest
+    except ModuleNotFoundError as exc:
+        if exc.name == "duckdb":
+            print("DuckDB is required for package execution.")
+            print()
+            print("Install the runtime dependencies with:")
+            print()
+            print("    python3 -m pip install -r requirements.txt")
+            return 1
+        raise
     outcome = execute_manifest(manifest)
 
     if outcome.validation_issues:
@@ -189,6 +197,19 @@ def main() -> int:
         return print_validation_report(args.manifest, args.verbose)
 
     if args.test:
+        try:
+            from package_tester import test_package
+            from package_test_reporter import format_package_test_report
+        except ModuleNotFoundError as exc:
+            if exc.name == "duckdb":
+                print("DuckDB is required for package testing.")
+                print()
+                print("Install the runtime dependencies with:")
+                print()
+                print("    python3 -m pip install -r requirements.txt")
+                return 1
+            raise
+
         result = test_package(args.manifest)
         print(format_package_test_report(result, verbose=args.verbose))
         return 0 if result.passed else 1

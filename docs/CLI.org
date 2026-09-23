@@ -168,3 +168,19 @@ to include matching artifact hashes and additional successful-test details.
 
 The command exits 0 only when preflight, execution, relation contracts, and
 artifact expectations all pass.
+
+
+* DuckDB runtime boundary
+
+Dry-run commands do not require DuckDB. They inspect package files and static
+contracts only.
+
+Execution requires DuckDB. If it is not installed, =--run= reports:
+
+#+begin_example
+DuckDB is required for package execution.
+
+Install the runtime dependencies with:
+
+    python3 -m pip install -r requirements.txt
+#+end_example
