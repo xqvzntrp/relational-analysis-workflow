@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v015
+#+VERSION: v016
 #+STARTUP: overview
 
 * Purpose
@@ -493,4 +493,32 @@ v015 corresponds to commit 015:
 
 #+begin_example
 015 feat: validate authority-zone dependency progression
+#+end_example
+
+
+* Package summary
+
+Successful verbose dry run now ends with a compact package summary.
+
+The summary reports:
+
+- total manifest steps
+- count of each execution mode
+- count of steps in each authority zone
+- relations created
+- final created relations not consumed by later steps
+- declared export outputs
+
+For the Product / Attribute / Bundle example, this provides a quick
+high-level picture of the whole analytical package without opening each SQL
+file individually.
+
+The summary is descriptive. It does not change execution semantics.
+
+* Current milestone
+
+v016 corresponds to commit 016:
+
+#+begin_example
+016 feat: add package summary to verbose dry run
 #+end_example

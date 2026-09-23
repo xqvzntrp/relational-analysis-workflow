@@ -313,3 +313,24 @@ Same-zone and earlier-zone dependencies remain valid.
 The check is based on actual relation dependencies rather than global
 manifest ordering, allowing independent analytical branches while preventing
 backward authority flow.
+
+
+* 016
+
+#+begin_example
+016 feat: add package summary to verbose dry run
+#+end_example
+
+Added a package-level summary after successful verbose validation.
+
+The summary includes:
+
+- step count
+- mode counts
+- authority-zone counts
+- created relations
+- terminal created relations
+- export outputs
+
+This gives dry run a concise package-level view in addition to step-level
+inspection and dependency details.

@@ -9,6 +9,7 @@ from manifest_validator import ValidationIssue
 from dependency_plan import StepDependency
 from dependency_validator import DependencyIssue
 from authority_validator import AuthorityIssue
+from package_summary import PackageSummary
 
 
 def format_issue(issue: ValidationIssue) -> str:
@@ -63,6 +64,7 @@ def format_validation_report(
     dependencies: list[StepDependency] | None = None,
     dependency_issues: list[DependencyIssue] | None = None,
     authority_issues: list[AuthorityIssue] | None = None,
+    package_summary: PackageSummary | None = None,
 ) -> str:
     """Render a complete validation report for command-line use."""
     lines: list[str] = [f"Dry run for {manifest}"]
@@ -92,6 +94,31 @@ def format_validation_report(
                         f"  Step {dep.step} [{dep.authority_zone}] "
                         f"creates: {created}; references: {referenced}"
                     )
+
+            if package_summary is not None:
+                lines.append("")
+                lines.append("Package summary:")
+                lines.append(f"  Steps: {package_summary.step_count}")
+
+                mode_text = ", ".join(
+                    f"{name}={count}"
+                    for name, count in sorted(package_summary.mode_counts.items())
+                ) or "(none)"
+                lines.append(f"  Modes: {mode_text}")
+
+                zone_text = ", ".join(
+                    f"{name}={count}"
+                    for name, count in sorted(package_summary.authority_zone_counts.items())
+                ) or "(none)"
+                lines.append(f"  Authority zones: {zone_text}")
+
+                created = ", ".join(package_summary.created_relations) or "(none)"
+                final_created = ", ".join(package_summary.final_created_relations) or "(none)"
+                exports = ", ".join(package_summary.export_outputs) or "(none)"
+
+                lines.append(f"  Relations created: {created}")
+                lines.append(f"  Final created relations: {final_created}")
+                lines.append(f"  Export outputs: {exports}")
         return "\n".join(lines)
 
     if not issues and dependency_issues:
@@ -117,6 +144,24 @@ def format_validation_report(
                     f"  Step {dep.step} [{dep.authority_zone}] "
                     f"creates: {created}; references: {referenced}"
                 )
+
+        if verbose and package_summary is not None:
+            lines.append("")
+            lines.append("Package summary:")
+            lines.append(f"  Steps: {package_summary.step_count}")
+            exports = ", ".join(package_summary.export_outputs) or "(none)"
+            finals = ", ".join(package_summary.final_created_relations) or "(none)"
+            lines.append(f"  Final created relations: {finals}")
+            lines.append(f"  Export outputs: {exports}")
+
+        if verbose and package_summary is not None:
+            lines.append("")
+            lines.append("Package summary:")
+            lines.append(f"  Steps: {package_summary.step_count}")
+            exports = ", ".join(package_summary.export_outputs) or "(none)"
+            finals = ", ".join(package_summary.final_created_relations) or "(none)"
+            lines.append(f"  Final created relations: {finals}")
+            lines.append(f"  Export outputs: {exports}")
 
         lines.append("")
         lines.append("No package steps were executed.")

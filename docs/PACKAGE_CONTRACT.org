@@ -352,3 +352,21 @@ A relation may not flow backward into an earlier authority zone.
 
 This rule is evaluated from discovered relation dependencies, not merely from
 the physical ordering of manifest rows.
+
+
+* Package summary
+
+Verbose dry run includes a package summary after validation succeeds.
+
+The summary is intended as an operator-facing overview and currently
+includes:
+
+- manifest step count
+- mode counts
+- authority-zone counts
+- relations created
+- terminal created relations
+- export outputs
+
+It is derived from the same manifest inspection and dependency-discovery
+model used by dry-run validation.

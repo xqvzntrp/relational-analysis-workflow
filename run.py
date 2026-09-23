@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Manifest-driven analytical package runner.
 
-v015 validates authority-zone dependency direction.
+v016 adds a package summary to successful verbose dry run.
 """
 
 from __future__ import annotations
@@ -17,6 +17,7 @@ from executor import database_path_for_manifest, execute_manifest
 from manifest_inspector import inspect_manifest
 from manifest_schema import AUTHORITY_ZONES, MANIFEST_COLUMNS, MODES
 from manifest_validator import validate_manifest
+from package_summary import summarize_package
 from validation_reporter import format_validation_report
 
 
@@ -45,6 +46,7 @@ def print_validation_report(manifest: Path, verbose: bool) -> int:
     authority_issues = []
     inspections = None
     dependencies = None
+    summary = None
 
     if not issues:
         dependencies = discover_manifest_dependencies(manifest)
@@ -53,6 +55,7 @@ def print_validation_report(manifest: Path, verbose: bool) -> int:
             authority_issues = validate_authority_progression(manifest)
         if verbose:
             inspections = inspect_manifest(manifest)
+            summary = summarize_package(manifest)
 
     print(format_validation_report(
         manifest,
@@ -62,6 +65,7 @@ def print_validation_report(manifest: Path, verbose: bool) -> int:
         dependencies=dependencies,
         dependency_issues=dependency_issues,
         authority_issues=authority_issues,
+        package_summary=summary,
     ))
 
     if not issues and not dependency_issues and not authority_issues and verbose:
