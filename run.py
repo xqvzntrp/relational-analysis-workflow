@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Manifest-driven analytical package runner.
 
-v003 adds dry-run manifest validation.
+v004 adds human-readable dry-run validation reporting.
 Execution logic will be added in later commits.
 """
 
@@ -12,6 +12,7 @@ from pathlib import Path
 
 from manifest_schema import AUTHORITY_ZONES, MANIFEST_COLUMNS, MODES
 from manifest_validator import validate_manifest
+from validation_reporter import format_validation_report
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -48,25 +49,16 @@ def build_parser() -> argparse.ArgumentParser:
 
 def print_validation_report(manifest: Path, verbose: bool) -> int:
     issues = validate_manifest(manifest)
+    print(format_validation_report(manifest, issues, verbose=verbose))
 
-    print(f"Dry run: {manifest}")
-
-    if not issues:
-        print("Validation passed.")
-        if verbose:
-            print(f"Expected columns: {', '.join(MANIFEST_COLUMNS)}")
-            print(f"Allowed modes: {', '.join(MODES)}")
-            print(f"Authority zones: {', '.join(AUTHORITY_ZONES)}")
-        return 0
-
-    print(f"Validation failed with {len(issues)} issue(s).")
-    for issue in issues:
+    if not issues and verbose:
         print()
-        print(f"Step {issue.step}: {issue.message}")
-        print(f"  Type: {issue.problem_type}")
-        print(f"  Hint: {issue.hint}")
+        print("Manifest contract:")
+        print(f"  Columns: {', '.join(MANIFEST_COLUMNS)}")
+        print(f"  Modes: {', '.join(MODES)}")
+        print(f"  Authority zones: {', '.join(AUTHORITY_ZONES)}")
 
-    return 1
+    return 0 if not issues else 1
 
 
 def main() -> int:

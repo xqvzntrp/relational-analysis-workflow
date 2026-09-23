@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v003
+#+VERSION: v004
 #+STARTUP: overview
 
 * Purpose
@@ -107,10 +107,37 @@ Example:
 python3 run.py --dry-run tests/fixtures/valid_manifest.csv
 #+end_src
 
-* Current milestone
+* Human-readable dry-run reporting
 
-v003 corresponds to commit 003:
+Validation is now rendered as command-line prose rather than raw internal
+validation records.
+
+A successful dry run reads like:
 
 #+begin_example
-003 feat: implement dry-run manifest validation
+Dry run for package/manifest.csv
+Result: ready to run.
+#+end_example
+
+A failure reads like:
+
+#+begin_example
+Dry run for package/manifest.csv
+Result: not ready to run. Found 1 problem.
+
+1. Step 3 failed because Mode 'bad_mode' is not allowed.
+  What to do: Use one of: load_csv, run_sql, export_sql
+
+No package steps were executed.
+#+end_example
+
+With =--verbose=, the report may also expose internal validation type names
+and the canonical manifest contract. The normal mode stays focused on prose.
+
+* Current milestone
+
+v004 corresponds to commit 004:
+
+#+begin_example
+004 feat: add human-readable validation reporting
 #+end_example

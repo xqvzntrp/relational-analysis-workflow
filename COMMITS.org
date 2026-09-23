@@ -65,3 +65,23 @@ Added pre-execution validation for:
 - mode-dependent outputs
 
 Added structured =ValidationIssue= records and basic unit-test fixtures.
+
+
+* 004
+
+#+begin_example
+004 feat: add human-readable validation reporting
+#+end_example
+
+Added a dedicated reporting layer for dry-run validation.
+
+The reporter:
+
+- describes success as "ready to run"
+- describes failure as "not ready to run"
+- renders each problem as prose
+- gives an explicit corrective hint
+- confirms that no package steps were executed after validation failure
+- shows internal validation types only in verbose mode
+
+This separates validation logic from presentation logic.
