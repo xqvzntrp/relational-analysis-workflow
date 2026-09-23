@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v008
+#+VERSION: v009
 #+STARTUP: overview
 
 * Purpose
@@ -244,10 +244,46 @@ file itself owns the names of the relations it creates.
 
 =export_sql= remains pending.
 
-* Current milestone
+* export_sql execution
 
-v008 corresponds to commit 008:
+The third concrete execution mode is now implemented.
+
+A manifest row such as:
 
 #+begin_example
-008 feat: implement run_sql execution
+3,export_sql,prepared_product,artifacts/product.csv,report
+#+end_example
+
+means:
+
+1. treat =prepared_product= as the relation to export
+2. resolve the output path relative to the manifest directory
+3. create the output directory when needed
+4. export the result as a CSV with a header
+5. report the exported row count
+
+The =input= field may also contain a =SELECT= or =WITH= query instead of a
+relation name.
+
+With this commit, all three manifest operations are executable:
+
+- =load_csv=
+- =run_sql=
+- =export_sql=
+
+The minimal end-to-end execution path is therefore complete:
+
+#+begin_example
+CSV source
+  -> DuckDB source table
+  -> SQL-created prepared view
+  -> CSV export
+#+end_example
+
+* Current milestone
+
+v009 corresponds to commit 009:
+
+#+begin_example
+009 feat: implement export_sql execution
 #+end_example

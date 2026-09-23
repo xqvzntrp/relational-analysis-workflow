@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Manifest-driven analytical package runner.
 
-v008 implements load_csv and run_sql execution with DuckDB.
+v009 implements all three execution modes with DuckDB.
 """
 
 from __future__ import annotations

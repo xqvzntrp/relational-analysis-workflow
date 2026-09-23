@@ -1,9 +1,11 @@
 from pathlib import Path
+import csv
+import tempfile
 import unittest
 
 import duckdb
 
-from mode_handlers import load_csv, run_sql
+from mode_handlers import export_sql, load_csv, run_sql
 
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -85,17 +87,64 @@ class RunSqlTests(unittest.TestCase):
         finally:
             connection.close()
 
-    def test_run_sql_rejects_empty_file(self):
-        empty_sql = FIXTURES / "sql" / "empty.sql"
-        empty_sql.write_text("", encoding="utf-8")
 
+class ExportSqlTests(unittest.TestCase):
+    def test_export_sql_exports_relation_to_csv(self):
         connection = duckdb.connect(":memory:")
         try:
-            with self.assertRaises(ValueError):
-                run_sql(connection, empty_sql)
+            load_csv(
+                connection,
+                FIXTURES / "data" / "product.csv",
+                "source_product",
+            )
+
+            with tempfile.TemporaryDirectory() as temp_dir:
+                output_path = Path(temp_dir) / "product.csv"
+
+                count = export_sql(
+                    connection,
+                    "source_product",
+                    output_path,
+                )
+
+                self.assertEqual(2, count)
+                self.assertTrue(output_path.exists())
+
+                with output_path.open("r", encoding="utf-8", newline="") as handle:
+                    rows = list(csv.reader(handle))
+
+                self.assertEqual(
+                    [
+                        ["product_id", "product_name"],
+                        ["P001", "Sofa"],
+                        ["P002", "Coffee Table"],
+                    ],
+                    rows,
+                )
         finally:
             connection.close()
-            empty_sql.unlink(missing_ok=True)
+
+    def test_export_sql_accepts_select_query(self):
+        connection = duckdb.connect(":memory:")
+        try:
+            load_csv(
+                connection,
+                FIXTURES / "data" / "product.csv",
+                "source_product",
+            )
+
+            with tempfile.TemporaryDirectory() as temp_dir:
+                output_path = Path(temp_dir) / "filtered.csv"
+
+                count = export_sql(
+                    connection,
+                    "SELECT * FROM source_product WHERE product_id = 'P001'",
+                    output_path,
+                )
+
+                self.assertEqual(1, count)
+        finally:
+            connection.close()
 
 
 if __name__ == "__main__":

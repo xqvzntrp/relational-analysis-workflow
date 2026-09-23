@@ -1,6 +1,6 @@
 """Execution engine for manifest-driven packages.
 
-v008 implements load_csv and run_sql.
+v009 implements load_csv, run_sql, and export_sql.
 """
 
 from __future__ import annotations
@@ -12,7 +12,7 @@ import duckdb
 
 from manifest_inspector import inspect_manifest
 from manifest_validator import validate_manifest
-from mode_handlers import load_csv, run_sql
+from mode_handlers import export_sql, load_csv, run_sql
 
 
 @dataclass(frozen=True)
@@ -83,14 +83,26 @@ def execute_manifest(path: Path) -> tuple[list[ExecutionResult], list]:
                 )
                 continue
 
-            results.append(
-                ExecutionResult(
-                    step=row.step,
-                    mode=row.mode,
-                    status="pending",
-                    message=f"Execution handler for {row.mode!r} is not implemented yet.",
+            if row.mode == "export_sql":
+                row_count = export_sql(
+                    connection,
+                    row.input_value,
+                    Path(row.resolved_output or ""),
                 )
-            )
+                results.append(
+                    ExecutionResult(
+                        step=row.step,
+                        mode=row.mode,
+                        status="completed",
+                        message=(
+                            f"Exported {row_count} rows from "
+                            f"{row.input_value!r} to {row.output_value!r}."
+                        ),
+                    )
+                )
+                continue
+
+            raise ValueError(f"Unsupported manifest mode: {row.mode}")
     finally:
         connection.close()
 

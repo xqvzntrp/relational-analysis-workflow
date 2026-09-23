@@ -12,6 +12,11 @@ def quote_identifier(identifier: str) -> str:
     return '"' + identifier.replace('"', '""') + '"'
 
 
+def quote_string_literal(value: str) -> str:
+    """Safely quote a SQL string literal."""
+    return "'" + value.replace("'", "''") + "'"
+
+
 def load_csv(
     connection: duckdb.DuckDBPyConnection,
     input_path: Path,
@@ -66,3 +71,40 @@ def run_sql(
         raise ValueError(f"SQL input is empty: {sql_path}")
 
     connection.execute(sql_text)
+
+
+def export_sql(
+    connection: duckdb.DuckDBPyConnection,
+    relation_or_query: str,
+    output_path: Path,
+) -> int:
+    """Export a relation or SELECT query to CSV and return the row count."""
+    source = relation_or_query.strip()
+
+    if not source:
+        raise ValueError("Input relation or query is required for export_sql.")
+
+    output_path = output_path.resolve()
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # A SELECT/WITH input is treated as SQL. Everything else is treated as
+    # a relation name so simple manifests remain concise.
+    lowered = source.lstrip().lower()
+    if lowered.startswith("select ") or lowered.startswith("with "):
+        query = source.rstrip().rstrip(";")
+    else:
+        query = f"SELECT * FROM {quote_identifier(source)}"
+
+    row_count = connection.execute(
+        f"SELECT COUNT(*) FROM ({query}) AS export_source"
+    ).fetchone()[0]
+
+    connection.execute(
+        f"""
+        COPY ({query})
+        TO {quote_string_literal(str(output_path))}
+        (HEADER, DELIMITER ',')
+        """
+    )
+
+    return int(row_count)

@@ -1,4 +1,5 @@
 from pathlib import Path
+import csv
 import shutil
 import unittest
 
@@ -16,15 +17,13 @@ class ExecutorTests(unittest.TestCase):
         if artifacts.exists():
             shutil.rmtree(artifacts)
 
-    def test_valid_manifest_executes_load_csv_and_run_sql(self):
+    def test_valid_manifest_executes_all_three_modes(self):
         manifest = FIXTURES / "valid_manifest.csv"
         results, issues = execute_manifest(manifest)
 
         self.assertEqual([], issues)
         self.assertEqual(3, len(results))
-        self.assertEqual("completed", results[0].status)
-        self.assertEqual("completed", results[1].status)
-        self.assertEqual("pending", results[2].status)
+        self.assertTrue(all(result.status == "completed" for result in results))
 
         database_path = database_path_for_manifest(manifest)
         self.assertTrue(database_path.exists())
@@ -41,6 +40,21 @@ class ExecutorTests(unittest.TestCase):
         self.assertEqual(
             [("P001", "SOFA"), ("P002", "COFFEE TABLE")],
             rows,
+        )
+
+        export_path = FIXTURES / "artifacts" / "product.csv"
+        self.assertTrue(export_path.exists())
+
+        with export_path.open("r", encoding="utf-8", newline="") as handle:
+            exported = list(csv.reader(handle))
+
+        self.assertEqual(
+            [
+                ["product_id", "product_name", "product_name_upper"],
+                ["P001", "Sofa", "SOFA"],
+                ["P002", "Coffee Table", "COFFEE TABLE"],
+            ],
+            exported,
         )
 
     def test_invalid_manifest_never_builds_execution_plan(self):

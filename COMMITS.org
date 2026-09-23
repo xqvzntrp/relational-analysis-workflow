@@ -167,3 +167,25 @@ Added the second concrete manifest mode.
 The SQL file owns the names of any views or tables it creates.
 
 Added a Prepared-layer SQL fixture and tests.
+
+
+* 009
+
+#+begin_example
+009 feat: implement export_sql execution
+#+end_example
+
+Added the third concrete manifest mode.
+
+=export_sql= now:
+
+- accepts a relation name or SELECT/WITH query
+- resolves output paths relative to the manifest
+- creates parent output directories
+- exports CSV with a header
+- reports the exported row count
+
+The sample manifest now runs the complete path from CSV source through SQL
+transformation to CSV export.
+
+All three manifest execution modes are now implemented.
