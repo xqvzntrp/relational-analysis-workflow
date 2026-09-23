@@ -1,4 +1,5 @@
 #+TITLE: run.py
+#+VERSION: v002
 #+STARTUP: overview
 
 * Purpose
@@ -6,15 +7,14 @@
 =run.py= is a small manifest-driven executor for reproducible analytical
 packages.
 
-The runner will eventually support three manifest operations:
+The runner is designed around three manifest operations:
 
-- load CSV
-- run SQL
-- export SQL to CSV
+- =load_csv=
+- =run_sql=
+- =export_sql=
 
-This first commit establishes the repository structure and command-line
-interface only. Validation and execution behavior will be implemented in
-later commits.
+This version defines the manifest contract and authority zones. Execution
+and validation behavior will be implemented in later commits.
 
 * Command-line contract
 
@@ -38,33 +38,57 @@ python3 run.py --run path/to/manifest.csv
 
 The =--dry-run= and =--run= options are mutually exclusive.
 
-* Planned authority zones
+* Manifest schema
 
-The manifest will later require each step to declare one authority zone
-from this set:
+The manifest has exactly five columns, in this order:
 
-- source
-- prepared
-- review
-- focused
-- inform
-- business
-- report
+#+begin_example
+step,mode,input,output,authority_zone
+#+end_example
+
+The final column is intentionally =authority_zone=. A later validation
+commit will enforce this exact header structure.
+
+* Manifest modes
+
+Allowed modes are:
+
+- =load_csv=
+- =run_sql=
+- =export_sql=
+
+* Authority zones
+
+Each manifest row must eventually declare exactly one authority zone from:
+
+- =source=
+- =prepared=
+- =review=
+- =focused=
+- =inform=
+- =business=
+- =report=
+
+These names are defined centrally in =manifest_schema.py= so later
+validation and execution code can consume one canonical contract.
 
 * Repository structure
 
 #+begin_example
 run-py/
 ├── run.py
+├── manifest_schema.py
 ├── README.org
+├── COMMITS.org
+├── VERSION
 ├── .gitignore
 └── tests/
 #+end_example
 
-* Commit represented by this version
+* Current milestone
+
+v002 corresponds to commit 002:
 
 #+begin_example
-chore: initialize runner repository with CLI skeleton
+002 feat: define manifest schema and authority zones
 #+end_example
-
-No package execution or manifest validation is implemented in this commit.

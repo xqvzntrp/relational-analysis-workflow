@@ -1,0 +1,47 @@
+#+TITLE: Commit Log
+#+STARTUP: overview
+
+* 001
+
+#+begin_example
+001 chore: initialize runner repository with CLI skeleton
+#+end_example
+
+Established:
+
+- =run.py=
+- =README.org=
+- =.gitignore=
+- =tests/=
+- CLI arguments =--dry-run=, =--run=, =--verbose=
+- positional manifest path
+
+* 002
+
+#+begin_example
+002 feat: define manifest schema and authority zones
+#+end_example
+
+Added the canonical manifest contract:
+
+#+begin_example
+step,mode,input,output,authority_zone
+#+end_example
+
+Added allowed modes:
+
+- =load_csv=
+- =run_sql=
+- =export_sql=
+
+Added authority zones:
+
+- =source=
+- =prepared=
+- =review=
+- =focused=
+- =inform=
+- =business=
+- =report=
+
+The contract is centralized in =manifest_schema.py=.

@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """Manifest-driven analytical package runner.
 
-Commit 1 establishes the command-line contract only.
-Execution and validation logic will be added in later commits.
+v002 defines the manifest contract and authority zones.
+Execution and manifest validation will be added in later commits.
 """
 
 from __future__ import annotations
 
 import argparse
 from pathlib import Path
+
+from manifest_schema import AUTHORITY_ZONES, MANIFEST_COLUMNS, MODES
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -54,6 +56,9 @@ def main() -> int:
 
     if args.verbose:
         print("Verbose: enabled")
+        print(f"Manifest columns: {', '.join(MANIFEST_COLUMNS)}")
+        print(f"Manifest modes: {', '.join(MODES)}")
+        print(f"Authority zones: {', '.join(AUTHORITY_ZONES)}")
 
     print("Status: command recognized; implementation pending.")
     return 0
