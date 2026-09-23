@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v024
+#+VERSION: v025
 #+STARTUP: overview
 
 * Purpose
@@ -785,4 +785,35 @@ product-bundle reference example.
 
 #+begin_example
 024 docs: freeze cycle 2 analysis contract
+#+end_example
+
+
+* Git repository delivery
+
+Starting with v025, the distributed package is a real Git repository rather
+than only a working-tree snapshot.
+
+The repository history was reconstructed from the preserved v001 through
+v024 version snapshots. Commit boundaries and messages therefore correspond
+to the actual delivered snapshots.
+
+The reconstructed timestamps are synthetic bookkeeping timestamps and are
+not presented as the original development times.
+
+After extracting the v025 archive, these commands work immediately:
+
+#+begin_example
+git status
+git log --oneline
+git show
+git diff HEAD~1
+#+end_example
+
+v025 changes repository packaging only; runner behavior remains the frozen
+v024 Cycle 2 behavior.
+
+* Current milestone
+
+#+begin_example
+025 chore: establish real git repository history
 #+end_example

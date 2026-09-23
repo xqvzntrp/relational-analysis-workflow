@@ -450,3 +450,28 @@ authority-zone semantics, dry-run and package-test interfaces, deterministic
 artifact contract, and the product-bundle reference example.
 
 Added contract-surface regression tests and a package review checklist.
+
+
+* 025
+
+#+begin_example
+025 chore: establish real git repository history
+#+end_example
+
+Converted the preserved v001 through v024 snapshots into actual Git commits.
+
+The delivered v025 package now includes its =.git/= directory, so normal
+repository commands work immediately after extraction:
+
+#+begin_example
+git status
+git log --oneline
+git show
+git diff HEAD~1
+#+end_example
+
+The commit contents and boundaries come from the preserved version snapshots.
+The reconstructed commit timestamps are synthetic bookkeeping timestamps;
+they do not claim to reproduce original historical commit times.
+
+No runner or analytical behavior changed in v025.
