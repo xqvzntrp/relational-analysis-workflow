@@ -1,0 +1,70 @@
+#+TITLE: run.py
+#+STARTUP: overview
+
+* Purpose
+
+=run.py= is a small manifest-driven executor for reproducible analytical
+packages.
+
+The runner will eventually support three manifest operations:
+
+- load CSV
+- run SQL
+- export SQL to CSV
+
+This first commit establishes the repository structure and command-line
+interface only. Validation and execution behavior will be implemented in
+later commits.
+
+* Command-line contract
+
+Dry run:
+
+#+begin_src shell
+python3 run.py --dry-run path/to/manifest.csv
+#+end_src
+
+Dry run with verbose diagnostics:
+
+#+begin_src shell
+python3 run.py --dry-run --verbose path/to/manifest.csv
+#+end_src
+
+Execution:
+
+#+begin_src shell
+python3 run.py --run path/to/manifest.csv
+#+end_src
+
+The =--dry-run= and =--run= options are mutually exclusive.
+
+* Planned authority zones
+
+The manifest will later require each step to declare one authority zone
+from this set:
+
+- source
+- prepared
+- review
+- focused
+- inform
+- business
+- report
+
+* Repository structure
+
+#+begin_example
+run-py/
+├── run.py
+├── README.org
+├── .gitignore
+└── tests/
+#+end_example
+
+* Commit represented by this version
+
+#+begin_example
+chore: initialize runner repository with CLI skeleton
+#+end_example
+
+No package execution or manifest validation is implemented in this commit.
