@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v021
+#+VERSION: v022
 #+STARTUP: overview
 
 * Purpose
@@ -686,4 +686,41 @@ the =ready= value.
 
 #+begin_example
 021 feat: add machine-readable json dry-run output
+#+end_example
+
+
+* Package test command
+
+The runner now has a package-level test lifecycle:
+
+#+begin_example
+python3 run.py --test MANIFEST
+python3 run.py --test --verbose MANIFEST
+#+end_example
+
+A package test performs, in order:
+
+1. manifest and package preflight validation
+2. dependency validation
+3. authority-zone validation
+4. grain and relation-contract specification validation
+5. artifact-specification validation
+6. fresh package execution
+7. runtime relation-contract checks against DuckDB
+8. deterministic artifact comparison
+
+The command stops before execution when preflight fails. After execution it
+checks realized relation columns, types, key uniqueness, and declared golden
+artifacts.
+
+The final result is an explicit =PACKAGE TEST: PASS= or
+=PACKAGE TEST: FAIL= and the process exit status matches that result.
+
+This command brings together the analysis-contract features developed across
+cycle 2 into one package-facing test operation.
+
+* Current milestone
+
+#+begin_example
+022 feat: add package-level test command
 #+end_example

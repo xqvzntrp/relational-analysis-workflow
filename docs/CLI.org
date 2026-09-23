@@ -148,3 +148,23 @@ python3 run.py --dry-run --verbose --json MANIFEST
 
 JSON output uses =schema_version= 1 and returns exit status 0 only when
 =ready=true=. =--json= is valid only with =--dry-run=.
+
+
+* Package test
+
+#+begin_example
+python3 run.py --test MANIFEST
+#+end_example
+
+runs the complete package test lifecycle.
+
+Use:
+
+#+begin_example
+python3 run.py --test --verbose MANIFEST
+#+end_example
+
+to include matching artifact hashes and additional successful-test details.
+
+The command exits 0 only when preflight, execution, relation contracts, and
+artifact expectations all pass.

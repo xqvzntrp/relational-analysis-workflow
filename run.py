@@ -23,6 +23,8 @@ from manifest_schema import AUTHORITY_ZONES, MANIFEST_COLUMNS, MODES
 from grain_analysis import analyze_grain
 from manifest_validator import validate_manifest
 from package_summary import summarize_package
+from package_tester import test_package
+from package_test_reporter import format_package_test_report
 from relation_contract import read_relation_contract
 from relation_contract_validator import validate_contract_declarations
 from validation_reporter import format_validation_report
@@ -39,6 +41,8 @@ def build_parser() -> argparse.ArgumentParser:
                       help="Validate the package without executing it.")
     mode.add_argument("--run", action="store_true",
                       help="Execute the package.")
+    mode.add_argument("--test", action="store_true",
+                      help="Run the complete package test lifecycle.")
 
     parser.add_argument("--verbose", action="store_true",
                         help="Show additional diagnostic information.")
@@ -183,6 +187,11 @@ def main() -> int:
 
     if args.dry_run:
         return print_validation_report(args.manifest, args.verbose)
+
+    if args.test:
+        result = test_package(args.manifest)
+        print(format_package_test_report(result, verbose=args.verbose))
+        return 0 if result.passed else 1
 
     return print_execution_report(args.manifest, args.verbose)
 

@@ -414,3 +414,16 @@ for artifact mismatches.
 
 Added a versioned JSON dry-run contract. Base output contains readiness and
 categorized issues; verbose output adds the package analysis model.
+
+
+* 022
+
+#+begin_example
+022 feat: add package-level test command
+#+end_example
+
+Added =--test= as a first-class package operation.
+
+The test lifecycle combines preflight validation, fresh execution, runtime
+relation-contract checks, and deterministic artifact comparison into one
+pass/fail command suitable for local development and CI.

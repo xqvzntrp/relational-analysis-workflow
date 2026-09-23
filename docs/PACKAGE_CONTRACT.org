@@ -460,3 +460,23 @@ Both paths are package-relative. After successful execution, generated
 artifacts are compared with expected files using SHA-256. CSV differences
 also receive a bounded row-oriented report. A mismatch is a package test
 failure and returns non-zero.
+
+
+* Package test lifecycle
+
+The =--test= operation is the package-level acceptance check.
+
+It combines:
+
+- static manifest validation
+- relation dependency validation
+- authority-zone dependency validation
+- grain specification validation
+- relation-contract declaration validation
+- artifact expectation validation
+- fresh package execution
+- realized relation schema/type/key checks
+- deterministic artifact checks
+
+A preflight failure prevents execution. Any later contract or artifact
+failure causes the package test to fail.
