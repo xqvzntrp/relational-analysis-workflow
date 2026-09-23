@@ -1,0 +1,103 @@
+#+TITLE: Product Bundle Example Walkthrough
+#+STARTUP: overview
+
+* Source relations
+
+The example package begins with:
+
+- Product
+- Attribute
+- Product Attribute
+- Bundle
+- Product Bundle
+
+The source files live under:
+
+#+begin_example
+tests/resources/product_bundle_example/data/
+#+end_example
+
+* Bundle grain
+
+The analytical path converges on one row per bundle.
+
+The example bundle is:
+
+#+begin_example
+B001
+Harbor Living Room Set
+#+end_example
+
+It contains:
+
+- one sofa
+- two pillows
+- one coffee table
+
+* Prepared
+
+The Prepared layer creates normalized, join-ready views for each source
+relation.
+
+* Review
+
+=review_bundle= establishes the wide analytical base at bundle grain.
+
+It adds columns including:
+
+- =distinct_product_count=
+- =total_unit_count=
+- =sofa_count=
+- =pillow_count=
+- =coffee_table_count=
+
+* Focused
+
+=focused_bundle= adds checks such as:
+
+#+begin_example
+has_sofa
+has_two_or_more_pillows
+#+end_example
+
+* Inform
+
+=inform_bundle= derives:
+
+#+begin_example
+sofa_with_two_pillows
+#+end_example
+
+For =B001= the expected value is =true=.
+
+* Business
+
+=business_bundle= selects the business-facing fields from the informed
+relation.
+
+* Report
+
+=report_bundle= is intentionally thin:
+
+#+begin_src sql
+CREATE OR REPLACE VIEW report_bundle AS
+SELECT * FROM business_bundle;
+#+end_src
+
+Its role is a stable downstream name.
+
+* Export
+
+The final manifest step exports =report_bundle= to:
+
+#+begin_example
+exports/bundle_report.csv
+#+end_example
+
+The expected output is recorded in:
+
+#+begin_example
+specifications/expected_report.csv
+#+end_example
+
+That file acts as an executable specification for integration testing.

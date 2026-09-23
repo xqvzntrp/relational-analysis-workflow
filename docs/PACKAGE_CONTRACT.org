@@ -1,0 +1,300 @@
+#+TITLE: Package Contract
+#+STARTUP: overview
+
+* Overview
+
+A package is the portable unit consumed by =run.py=.
+
+A package is identified by its manifest file. All relative paths in the
+manifest are resolved from the directory containing that manifest.
+
+A typical package may contain:
+
+#+begin_example
+package/
+├── manifest.csv
+├── data/
+├── sql/
+├── exports/
+├── specifications/
+└── artifacts/
+#+end_example
+
+Only =manifest.csv= is required by the runner. The other directories are
+conventions used by the example package and are recommended because they
+make the package easy to inspect.
+
+* Manifest schema
+
+The manifest must contain exactly these columns, in this order:
+
+#+begin_example
+step,mode,input,output,authority_zone
+#+end_example
+
+The schema is strict.
+
+** step
+
+=step= is a positive integer.
+
+Each step number must be unique.
+
+Rows execute in manifest order after validation succeeds.
+
+** mode
+
+Allowed values are:
+
+- =load_csv=
+- =run_sql=
+- =export_sql=
+
+** input
+
+The meaning of =input= depends on =mode=.
+
+For =load_csv=:
+
+#+begin_example
+data/product.csv
+#+end_example
+
+The input is a CSV file path relative to the manifest.
+
+For =run_sql=:
+
+#+begin_example
+sql/prepared_product.sql
+#+end_example
+
+The input is a SQL file path relative to the manifest.
+
+For =export_sql=:
+
+#+begin_example
+report_bundle
+#+end_example
+
+The input may be either:
+
+- a relation name
+- a =SELECT= query
+- a =WITH= query
+
+** output
+
+For =load_csv=, =output= is the target relation name.
+
+Example:
+
+#+begin_example
+source_product
+#+end_example
+
+For =run_sql=, =output= is intentionally unused. The SQL file owns the
+names of the relations it creates.
+
+For =export_sql=, =output= is the destination CSV path relative to the
+manifest.
+
+Example:
+
+#+begin_example
+exports/bundle_report.csv
+#+end_example
+
+** authority_zone
+
+Each row must declare exactly one authority zone:
+
+- =source=
+- =prepared=
+- =review=
+- =focused=
+- =inform=
+- =business=
+- =report=
+
+The authority zone is metadata describing where that step belongs in the
+analytical architecture.
+
+The runner validates the value but does not currently enforce dependency
+rules between zones.
+
+* Authority-zone model
+
+The intended analytical progression is:
+
+#+begin_example
+source
+-> prepared
+-> review
+-> focused
+-> inform
+-> business
+-> report
+#+end_example
+
+** source
+
+Loaded representations of external source files.
+
+** prepared
+
+Structural normalization and join-ready relations.
+
+Typical responsibilities include:
+
+- standardized identifiers
+- type normalization
+- trimming and cleanup
+- join-key readiness
+
+** review
+
+The broad analytical base.
+
+The Review layer may become wide by adding derived columns while
+preserving its analytical grain.
+
+** focused
+
+Purpose-oriented narrowing or checks applied to the Review layer.
+
+** inform
+
+Derived meaning built from analytical facts.
+
+This is where a statement such as:
+
+#+begin_example
+sofa_with_two_pillows = true
+#+end_example
+
+can emerge from lower-level facts.
+
+** business
+
+Business-facing interpretation or presentation of the Inform layer.
+
+** report
+
+A stable downstream identifier.
+
+A report relation may intentionally be very thin:
+
+#+begin_src sql
+CREATE OR REPLACE VIEW report_bundle AS
+SELECT * FROM business_bundle;
+#+end_src
+
+This lets the business relation evolve without changing the stable report
+name consumed downstream.
+
+* Execution model
+
+Every =--run= follows this sequence:
+
+1. validate the manifest
+2. stop before execution if validation fails
+3. create a fresh package DuckDB database
+4. execute manifest rows in order
+5. stop at the first runtime failure
+6. preserve completed-step diagnostics
+7. skip all later steps after a failure
+
+The DuckDB execution database is written to:
+
+#+begin_example
+artifacts/package.duckdb
+#+end_example
+
+relative to the manifest directory.
+
+The database is recreated on each run.
+
+* Fresh-run discipline
+
+The runner is designed for reproducibility rather than incremental mutation.
+
+A package should be able to rebuild its analytical result from declared
+source files and SQL.
+
+Generated artifacts are therefore disposable outputs of a package run.
+
+* Path rules
+
+Relative paths are resolved from the manifest directory.
+
+For example, given:
+
+#+begin_example
+packages/furniture/manifest.csv
+#+end_example
+
+and:
+
+#+begin_example
+data/product.csv
+#+end_example
+
+the resolved file is:
+
+#+begin_example
+packages/furniture/data/product.csv
+#+end_example
+
+This makes the package portable as a directory.
+
+* Validation contract
+
+Dry run currently checks:
+
+- manifest existence
+- manifest readability
+- exact header structure
+- positive integer steps
+- duplicate steps
+- allowed modes
+- allowed authority zones
+- required inputs
+- mode-dependent required outputs
+
+A validation failure performs no package work.
+
+* Runtime error contract
+
+Execution stops at the first runtime failure.
+
+Current diagnostic categories include:
+
+- =input_missing=
+- =permission_denied=
+- =text_encoding_error=
+- =duckdb_error=
+- =invalid_execution_input=
+- =execution_error=
+
+The command-line report includes a corrective hint.
+
+Verbose mode additionally exposes the internal problem type.
+
+* Example package
+
+The canonical integration example is:
+
+#+begin_example
+tests/resources/product_bundle_example/
+#+end_example
+
+It demonstrates:
+
+- five source relations
+- all seven authority zones
+- a bundle-grain Review relation
+- Focused and Inform derivations
+- a Business relation
+- a stable Report relation
+- CSV export
+- negative validation and runtime cases

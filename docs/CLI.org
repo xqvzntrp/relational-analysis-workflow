@@ -1,0 +1,139 @@
+#+TITLE: Command-Line Interface
+#+STARTUP: overview
+
+* Synopsis
+
+#+begin_example
+python3 run.py (--dry-run | --run) [--verbose] MANIFEST
+#+end_example
+
+* Required execution mode
+
+Exactly one of the following is required:
+
+- =--dry-run=
+- =--run=
+
+They are mutually exclusive.
+
+* Manifest argument
+
+=MANIFEST= is a positional path to the package manifest CSV.
+
+Example:
+
+#+begin_src shell
+python3 run.py --dry-run tests/resources/product_bundle_example/manifest.csv
+#+end_src
+
+* Dry run
+
+Dry run validates without executing package operations.
+
+#+begin_src shell
+python3 run.py --dry-run path/to/manifest.csv
+#+end_src
+
+A successful dry run reports:
+
+#+begin_example
+Result: ready to run.
+#+end_example
+
+A failing dry run reports:
+
+- the problem
+- the affected step when applicable
+- a corrective hint
+- confirmation that no package steps were executed
+
+* Verbose dry run
+
+#+begin_src shell
+python3 run.py --dry-run --verbose path/to/manifest.csv
+#+end_src
+
+Verbose dry run additionally reports the execution plan row by row.
+
+For each step it can show:
+
+- manifest line number
+- step number
+- mode
+- authority zone
+- input
+- output
+- resolved paths
+
+It also prints the canonical manifest contract.
+
+* Run
+
+#+begin_src shell
+python3 run.py --run path/to/manifest.csv
+#+end_src
+
+The run validates first.
+
+If validation succeeds, the runner creates a fresh DuckDB database at:
+
+#+begin_example
+artifacts/package.duckdb
+#+end_example
+
+and executes the manifest in order.
+
+* Verbose run
+
+#+begin_src shell
+python3 run.py --run --verbose path/to/manifest.csv
+#+end_src
+
+Verbose mode preserves the same execution behavior while exposing internal
+problem categories when failures occur.
+
+* Exit behavior
+
+Successful validation or execution returns exit status =0=.
+
+Validation or execution failure returns a nonzero status.
+
+This makes the runner suitable for shell scripts and CI jobs.
+
+* Examples
+
+** Validate the furniture example
+
+#+begin_src shell
+python3 run.py --dry-run \
+  tests/resources/product_bundle_example/manifest.csv
+#+end_src
+
+** Inspect the furniture example in detail
+
+#+begin_src shell
+python3 run.py --dry-run --verbose \
+  tests/resources/product_bundle_example/manifest.csv
+#+end_src
+
+** Execute the furniture example
+
+#+begin_src shell
+python3 run.py --run \
+  tests/resources/product_bundle_example/manifest.csv
+#+end_src
+
+Expected outputs include:
+
+#+begin_example
+tests/resources/product_bundle_example/artifacts/package.duckdb
+tests/resources/product_bundle_example/exports/bundle_report.csv
+#+end_example
+
+* Dependency installation
+
+#+begin_src shell
+python3 -m pip install -r requirements.txt
+#+end_src
+
+The current runtime dependency is DuckDB.

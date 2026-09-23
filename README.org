@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v011
+#+VERSION: v012
 #+STARTUP: overview
 
 * Purpose
@@ -358,10 +358,29 @@ The integration fixture includes:
 This makes the example package both documentation and an executable
 regression fixture.
 
+* Documentation
+
+The repository now has dedicated documentation under =docs/=:
+
+- =docs/PACKAGE_CONTRACT.org=
+  defines the manifest, authority zones, path rules, validation contract,
+  execution model, and runtime failure contract.
+
+- =docs/CLI.org=
+  documents =--dry-run=, =--run=, =--verbose=, exit behavior, and command
+  examples.
+
+- =docs/EXAMPLE_PACKAGE.org=
+  walks through the Product / Attribute / Bundle example from source through
+  report export.
+
+Together these documents make the runner contract explicit without requiring
+a reader to infer behavior from implementation code.
+
 * Current milestone
 
-v011 corresponds to commit 011:
+v012 corresponds to commit 012:
 
 #+begin_example
-011 test: add product bundle example package integration coverage
+012 docs: document package contract and command-line interface
 #+end_example

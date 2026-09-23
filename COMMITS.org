@@ -237,3 +237,23 @@ The fixture includes:
 
 The package now serves as documentation, integration coverage, and a
 regression fixture.
+
+
+* 012
+
+#+begin_example
+012 docs: document package contract and command-line interface
+#+end_example
+
+Added dedicated Org-mode documentation for:
+
+- the package and manifest contract
+- authority-zone semantics
+- path resolution
+- validation behavior
+- fresh-run execution
+- runtime failure behavior
+- command-line usage
+- the Product / Attribute / Bundle example package
+
+This completes the original twelve-commit runner repository plan.
