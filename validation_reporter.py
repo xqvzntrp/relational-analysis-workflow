@@ -11,6 +11,7 @@ from dependency_validator import DependencyIssue
 from authority_validator import AuthorityIssue
 from package_summary import PackageSummary
 from grain_analysis import GrainAnalysis
+from relation_contract import ContractColumn, ContractIssue
 
 
 def format_issue(issue: ValidationIssue) -> str:
@@ -67,6 +68,8 @@ def format_validation_report(
     authority_issues: list[AuthorityIssue] | None = None,
     package_summary: PackageSummary | None = None,
     grain_analysis: GrainAnalysis | None = None,
+    relation_contracts: list[ContractColumn] | None = None,
+    contract_issues: list[ContractIssue] | None = None,
 ) -> str:
     """Render a complete validation report for command-line use."""
     lines: list[str] = [f"Dry run for {manifest}"]
@@ -121,6 +124,31 @@ def format_validation_report(
                 lines.append(f"  Relations created: {created}")
                 lines.append(f"  Final created relations: {final_created}")
                 lines.append(f"  Export outputs: {exports}")
+
+            if relation_contracts is not None:
+                lines.append("")
+                lines.append("Declared relation contracts:")
+                if not relation_contracts:
+                    lines.append("  (none)")
+                else:
+                    current_relation = None
+                    for item in relation_contracts:
+                        if item.relation != current_relation:
+                            current_relation = item.relation
+                            lines.append(f"  {current_relation}:")
+                        key_text = " key" if item.key else ""
+                        lines.append(
+                            f"    {item.column}: {item.data_type}{key_text}"
+                        )
+
+                if contract_issues:
+                    lines.append("")
+                    lines.append("Relation contract problems:")
+                    for issue in contract_issues:
+                        lines.append(
+                            f"  {issue.problem_type}: {issue.message} "
+                            f"What to do: {issue.hint}"
+                        )
 
             if grain_analysis is not None:
                 lines.append("")

@@ -355,3 +355,23 @@ Verbose dry run can now show:
 The Product / Attribute / Bundle example declares source and analytical
 grains, making the aggregation from =bundle_id + product_id= to =bundle_id=
 visible before execution.
+
+
+* 018
+
+#+begin_example
+018 feat: add optional relation contracts for columns keys and types
+#+end_example
+
+Added optional relation contracts at
+=specifications/relation_contract.csv=.
+
+Contracts may declare:
+
+- expected columns
+- expected DuckDB data types
+- simple or composite key columns
+
+Static validation connects contracts with package-created relations and
+grain declarations. A runtime validator is included for realized schema and
+key uniqueness checks.

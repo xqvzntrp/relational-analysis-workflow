@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Manifest-driven analytical package runner.
 
-v017 adds optional grain declarations and grain-aware dry-run reporting.
+v018 adds optional relation contracts for columns, keys, and types.
 """
 
 from __future__ import annotations
@@ -19,6 +19,8 @@ from manifest_schema import AUTHORITY_ZONES, MANIFEST_COLUMNS, MODES
 from grain_analysis import analyze_grain
 from manifest_validator import validate_manifest
 from package_summary import summarize_package
+from relation_contract import read_relation_contract
+from relation_contract_validator import validate_contract_declarations
 from validation_reporter import format_validation_report
 
 
@@ -49,12 +51,22 @@ def print_validation_report(manifest: Path, verbose: bool) -> int:
     dependencies = None
     summary = None
     grain_analysis = None
+    relation_contracts = None
+    contract_issues = []
 
     if not issues:
         dependencies = discover_manifest_dependencies(manifest)
         dependency_issues = validate_dependencies(manifest)
         if not dependency_issues:
             authority_issues = validate_authority_progression(manifest)
+
+        relation_contracts, parse_contract_issues = read_relation_contract(manifest)
+        contract_issues = (
+            parse_contract_issues
+            if parse_contract_issues
+            else validate_contract_declarations(manifest)
+        )
+
         if verbose:
             inspections = inspect_manifest(manifest)
             summary = summarize_package(manifest)
@@ -70,6 +82,8 @@ def print_validation_report(manifest: Path, verbose: bool) -> int:
         authority_issues=authority_issues,
         package_summary=summary,
         grain_analysis=grain_analysis,
+        relation_contracts=relation_contracts,
+        contract_issues=contract_issues,
     ))
 
     if not issues and not dependency_issues and not authority_issues and verbose:

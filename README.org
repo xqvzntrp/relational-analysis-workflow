@@ -1,5 +1,5 @@
 #+TITLE: run.py
-#+VERSION: v017
+#+VERSION: v018
 #+STARTUP: overview
 
 * Purpose
@@ -571,4 +571,41 @@ v017 corresponds to commit 017:
 
 #+begin_example
 017 feat: add analytical grain declarations and dry-run reporting
+#+end_example
+
+
+* Relation contracts
+
+Packages may now optionally declare expected relation structure in:
+
+#+begin_example
+specifications/relation_contract.csv
+#+end_example
+
+The strict schema is:
+
+#+begin_example
+relation,column,data_type,key
+#+end_example
+
+Each row declares one expected column. Composite keys are represented by
+marking multiple columns of the same relation as =key=true=.
+
+Dry run checks that:
+
+- contracted relations are produced by the package
+- grain keys appear in the contract when both are declared
+- grain keys are marked =key=true=
+
+Verbose dry run displays the declared contracts.
+
+A runtime validator is also included for checking realized DuckDB columns,
+data types, and key uniqueness.
+
+* Current milestone
+
+v018 corresponds to commit 018:
+
+#+begin_example
+018 feat: add optional relation contracts for columns keys and types
 #+end_example

@@ -402,3 +402,30 @@ show where grain is preserved and where grain changes.
 
 Grain declarations are descriptive in v017. They prepare the package model
 for stronger relation contracts in later commits.
+
+
+* Relation contracts
+
+A package may optionally contain:
+
+#+begin_example
+specifications/relation_contract.csv
+#+end_example
+
+with the strict header:
+
+#+begin_example
+relation,column,data_type,key
+#+end_example
+
+Each row declares one expected column.
+
+The =key= field must be =true= or =false=. Composite keys are represented by
+marking multiple columns in the same relation as keys.
+
+Static validation checks that contracted relations belong to the package and
+that declared grain keys are represented as key columns where both
+specifications exist.
+
+The runtime contract validator can compare a realized DuckDB relation
+against expected columns, data types, and key uniqueness.
